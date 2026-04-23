@@ -118,7 +118,7 @@ Heart-Failure-Monitoring-App/
     ├── parent_input.html  # 本人（親）用データ入力画面
     ├── parent_done.html   # 入力完了画面
     └── child_dashboard.html # 家族（子）用モニタリング画面
-
+```
 ---
 
 ## 🗄 データモデル（概要）
