@@ -104,19 +104,19 @@ SUNABACO PBL 卒業制作
 
 ## 📁 ファイル構成
 Heart-Failure-Monitoring-App/
-├── app.py                  # Flask ルーティング / 判定ロジック
-├── init_db.py              # DB初期化＋デモユーザー作成
-├── requirements.txt
-├── .env.example
+├── app.py                # Flask ルーティング / 判定ロジック（メインプログラム）
+├── init_db.py            # データベース初期化 ＋ デモユーザー作成スクリプト
+├── requirements.txt      # 依存ライブラリ一覧
+├── .env.example          # 環境変数のサンプルファイル
 ├── static/
-│   └── style.css           # 共通CSS（高齢者UX含む）
+│   └── style.css         # 共通スタイルシート（高齢者向けUX設計を含む）
 └── templates/
-├── base.html
-├── setup.html
-├── parent_login.html
-├── parent_input.html
-├── parent_done.html
-└── child_dashboard.html
+    ├── base.html         # 全画面共通のベースレイアウト
+    ├── setup.html        # 初期設定画面
+    ├── parent_login.html  # 本人（親）用ログイン画面
+    ├── parent_input.html  # 本人（親）用データ入力画面
+    ├── parent_done.html   # 入力完了画面
+    └── child_dashboard.html # 家族（子）用モニタリング画面
 
 ---
 
