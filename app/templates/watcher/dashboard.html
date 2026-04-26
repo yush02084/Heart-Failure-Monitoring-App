@@ -96,12 +96,20 @@
 
     </div><!-- /.w-stat-row -->
 
-    <!-- 詳細 / 電話ボタン -->
-    <!-- Flask alert_level >= 2 なら「今すぐ電話する」（赤）、それ以外は「詳細を見る」（緑） -->
-    <!-- Flask: href="{{ url_for('watcher.parent_detail', parent_id=p.parent_id) }}" -->
-    <a href="parent_detail.html" class="w-btn-call w-btn-call--danger">
-      📞 今すぐ山田太郎に電話する
-    </a>
+    <!-- ボタン行 -->
+    <div class="w-card-actions">
+      <!-- 詳細ボタン（常時表示） -->
+      <!-- Flask: href="{{ url_for('watcher.parent_detail', parent_id=p.parent_id) }}" -->
+      <a href="parent_detail.html" class="w-btn-call w-btn-call--outline w-btn-call--sm">
+        📋 詳細を見る
+      </a>
+      <!-- 電話ボタン（alert_level >= 2 のみ表示） -->
+      <!-- Flask: {% if p.alert_level >= 2 %} -->
+      <a href="tel:+819012345678" class="w-btn-call w-btn-call--danger w-btn-call--sm">
+        📞 電話する
+      </a>
+      <!-- Flask: {% endif %} -->
+    </div>
 
   </div><!-- /.w-parent-card（警戒ケース） -->
 
@@ -149,9 +157,13 @@
 
     </div>
 
-    <a href="parent_detail.html" class="w-btn-call w-btn-call--outline">
-      📋 山田花子の詳細を見る
-    </a>
+    <!-- ボタン行（通常: 詳細のみ） -->
+    <div class="w-card-actions">
+      <a href="parent_detail.html" class="w-btn-call w-btn-call--outline w-btn-call--sm">
+        📋 詳細を見る
+      </a>
+      <!-- 電話ボタンなし（alert_level=1 のため非表示） -->
+    </div>
 
   </div><!-- /.w-parent-card（通常ケース） -->
 

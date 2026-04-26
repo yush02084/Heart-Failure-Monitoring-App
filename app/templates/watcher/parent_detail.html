@@ -61,10 +61,16 @@
        ============================== -->
   <div class="w-detail-profile">
     <div class="w-avatar w-avatar--lg">👴</div>
-    <div>
+    <div class="w-detail-profile__info">
       <div class="w-detail-profile__name">山田太郎 様</div>
       <div class="w-detail-profile__sub">📞 090-1234-5678</div>
     </div>
+    <!-- 電話ボタン（should_show_call_button=True のみ表示）-->
+    <!-- Flask: {% if today_alert.should_show_call_button %} -->
+    <a href="tel:+819012345678" class="w-btn-call w-btn-call--danger w-btn-call--compact">
+      📞 電話する
+    </a>
+    <!-- Flask: {% endif %} -->
   </div>
 
   <!-- ==============================
@@ -187,15 +193,7 @@
      電話ボタン固定（should_show_call_button = True のみ表示）
      Flask: {% if today_alert.should_show_call_button %}
      ============================== -->
-<div class="w-call-fixed">
-  <!-- Flask: href="{{ parent.tel_link }}" -->
-  <!-- Flask: 今すぐ {{ parent.name }} に電話する -->
-  <!-- PC時は max-width: 400px でボタン幅を抑える（watcher.css参照） -->
-  <a href="tel:+819012345678" class="w-btn-call w-btn-call--danger">
-    📞 今すぐ山田太郎に電話する
-  </a>
-</div>
-<!-- Flask: {% endif %} -->
+<!-- 固定電話ボタンはプロフィールカード内に移動済み -->
 
 <!-- ==============================
      ボトムナビ
