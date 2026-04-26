@@ -42,11 +42,6 @@
 - **security-review** — 認証・フォーム・DBアクセスのレビュー時
 - **design-system** — デザイントークン・CSS変数の整合性確認時
 - **frontend-patterns** — Jinja2テンプレート・JS実装のパターン参照時
-- **healthcare-cdss-patterns** — アラートロジック・スコアリング設計時
-- **healthcare-phi-compliance** — 患者データの取り扱い・プライバシー確認時
-- **hipaa-compliance** — 医療データセキュリティ要件確認時
-- **accessibility** — WCAG対応・高齢者向けUI確認時
-- **git-workflow** — チーム開発・ブランチ運用・コンフリクト解消時
 
 ---
 
