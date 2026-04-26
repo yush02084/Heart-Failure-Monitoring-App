@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<!--
+  login.html — 共通ログイン画面（親・子共用）
+  Flask統合時:
+    - {% extends "base.html" %} に置き換え
+    - CSS linkを {{ url_for('static', filename='css/watcher.css') }} に変更
+    - action="{{ url_for('auth.login') }}" に変更
+    - flash メッセージは base.html の {% with messages %} で表示される
+-->
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ログイン — 心不全見守り</title>
+  <link rel="stylesheet" href="../../static/css/watcher.css">
+  <style>
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      background: var(--bg);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      background: var(--surface);
+      border: 1px solid var(--outline-variant);
+      border-radius: var(--radius-lg);
+      padding: 40px 32px;
+      box-shadow: 0 4px 20px rgba(0, 98, 105, 0.08);
+    }
+
+    /* ロゴ */
+    .login-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+    .login-logo__icon { font-size: 40px; }
+    .login-logo__name {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .login-logo__sub {
+      font-size: 13px;
+      color: var(--on-surface-muted);
+    }
+
+    /* flash メッセージ（スタンドアロン用モック） */
+    .flash {
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    .flash-error {
+      background: #ffdad6;
+      color: var(--danger);
+      border-left: 4px solid var(--danger);
+    }
+    .flash-success {
+      background: #d4edda;
+      color: #155724;
+      border-left: 4px solid #155724;
+    }
+
+    /* フォームフィールド */
+    .login-field {
+      margin-bottom: 20px;
+    }
+    .login-field label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--on-surface);
+      margin-bottom: 6px;
+    }
+    .login-field input {
+      width: 100%;
+      min-height: 52px;
+      padding: 0 14px;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 16px;
+      color: var(--on-surface);
+      background: var(--surface);
+      border: 1.5px solid var(--outline-variant);
+      border-radius: var(--radius);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      appearance: none;
+    }
+    .login-field input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 98, 105, 0.12);
+    }
+    .login-field input::placeholder { color: var(--outline); }
+
+    .login-field__hint {
+      font-size: 12px;
+      color: var(--on-surface-muted);
+      margin-top: 5px;
+    }
+
+    /* 送信ボタン */
+    .login-submit {
+      width: 100%;
+      min-height: 56px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-xl);
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .login-submit:hover  { opacity: 0.92; }
+    .login-submit:active { opacity: 0.85; transform: scale(0.99); }
+
+    /* 登録リンク */
+    .login-footer {
+      text-align: center;
+      font-size: 13px;
+      color: var(--on-surface-muted);
+      margin-top: 24px;
+      line-height: 1.8;
+    }
+    .login-footer a {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* 注意書き */
+    .login-notice {
+      background: var(--surface-low);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--on-surface-muted);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-page">
+  <div class="login-card">
+
+    <!-- ロゴ -->
+    <div class="login-logo">
+      <span class="login-logo__icon">🫀</span>
+      <span class="login-logo__name">心不全見守り</span>
+      <span class="login-logo__sub">ログイン</span>
+    </div>
+
+    <!-- flash メッセージ（Flask: base.html で表示） -->
+    <!-- スタンドアロン確認用モック（Flask統合後はこのブロックを削除） -->
+    <!--
+    <div class="flash flash-error">
+      ログインIDまたはPINが間違っています。
+    </div>
+    -->
+
+    <!-- 役割の補足 -->
+    <div class="login-notice">
+      👴 親の方：4桁のPINでログイン<br>
+      👨 見守り担当の方：登録時のパスワードでログイン
+    </div>
+
+    <!-- ==============================
+         フォーム
+         Flask: action="{{ url_for('auth.login') }}"
+         ============================== -->
+    <form method="POST" action="#">
+
+      <!-- CSRF token（Flask: {{ form.csrf_token }}） -->
+      <input type="hidden" name="csrf_token" value="mock-csrf-token">
+
+      <!-- ログインID -->
+      <div class="login-field">
+        <label for="login_id">ログインID</label>
+        <!-- Flask: value="{{ form.login_id.data or '' }}" -->
+        <input type="text" id="login_id" name="login_id"
+               placeholder="ログインIDを入力"
+               autocomplete="username"
+               required>
+        <!-- Flask: {% if form.login_id.errors %}
+          <div class="field-error">{{ form.login_id.errors[0] }}</div>
+        {% endif %} -->
+      </div>
+
+      <!-- PIN / パスワード -->
+      <div class="login-field">
+        <label for="pin">PIN / パスワード</label>
+        <input type="password" id="pin" name="pin"
+               placeholder="PIN（4桁）またはパスワード"
+               autocomplete="current-password"
+               required>
+        <div class="login-field__hint">
+          ※ラベルの名称はAさんと要確認
+        </div>
+        <!-- Flask: {% if form.pin.errors %}
+          <div class="field-error">{{ form.pin.errors[0] }}</div>
+        {% endif %} -->
+      </div>
+
+      <button type="submit" class="login-submit">ログイン</button>
+
+    </form>
+
+    <!-- フッター -->
+    <div class="login-footer">
+      見守り担当の方で初めての方は<br>
+      招待リンクからアカウントを作成してください
+    </div>
+
+  </div><!-- /.login-card -->
+</div><!-- /.login-page -->
+
+</body>
+</html>
