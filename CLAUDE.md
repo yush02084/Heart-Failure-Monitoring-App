@@ -47,6 +47,8 @@
 - **hipaa-compliance** — 医療データセキュリティ要件確認時
 - **accessibility** — WCAG対応・高齢者向けUI確認時
 - **git-workflow** — チーム開発・ブランチ運用・コンフリクト解消時
+- **finishing-a-development-branch** — ブランチ完成時のチェックリスト
+- **systematic-debugging** — Flaskのバグを体系的に潰す時
 
 ---
 
