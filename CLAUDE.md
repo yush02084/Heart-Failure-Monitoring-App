@@ -49,6 +49,11 @@
 - **git-workflow** — チーム開発・ブランチ運用・コンフリクト解消時
 - **finishing-a-development-branch** — ブランチ完成時のチェックリスト
 - **systematic-debugging** — Flaskのバグを体系的に潰す時
+- **flask-api-development** — Flask Blueprint・ルーティング・認証実装時
+- **flask-python** — Flaskベストプラクティス・application factory参照時
+- **sqlite-database-expert** — SQLite設計・クエリ・マイグレーション時
+- **accessibility-a11y** — WCAG対応・アクセシブルなHTML実装時
+- **code-review-quality** — コードレビュー・品質チェック時
 
 ---
 
