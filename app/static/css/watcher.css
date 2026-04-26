@@ -418,15 +418,39 @@ a { color: inherit; text-decoration: none; }
    ============================== */
 @media (min-width: 768px) {
   body { padding-bottom: 0; }
+
   .w-container {
-    max-width: 680px;
+    max-width: 960px;
     padding-top: 32px;
   }
+
+  /* ボトムナビ → 非表示 */
   .w-bottom-nav { display: none; }
+
+  /* ダッシュボード: 親カードを2列グリッドに */
+  .w-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  /* 詳細: 電話ボタンは固定せずコンテンツ内に収める */
   .w-call-fixed {
     position: static;
     padding: 0;
     background: none;
-    margin-bottom: 32px;
+    margin: 16px 0 32px;
   }
+
+  /* 詳細: ボタン幅を抑える */
+  .w-call-fixed .w-btn-call {
+    max-width: 400px;
+  }
+
+  /* 詳細: スタットチップを大きく */
+  .w-stats-chip__value { font-size: 24px; }
+
+  /* テーブルフォント少し大きく */
+  .w-table { font-size: 15px; }
+  .w-table th { font-size: 13px; }
 }

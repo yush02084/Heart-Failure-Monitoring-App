@@ -37,6 +37,9 @@
   <h1 class="w-page-title">見守り対象</h1>
   <p class="w-page-subtitle">最新の健康状態を監視しています。</p>
 
+  <!-- PC: 2列グリッド wrapper（Flask: {% for p in watched_parents %} をこの中に） -->
+  <div class="w-cards-grid">
+
   <!-- ===================================
        親カード ×1（モックデータ: 警戒ケース）
        Flask統合後: {% for p in watched_parents %} でループ
@@ -152,6 +155,8 @@
 
   </div><!-- /.w-parent-card（通常ケース） -->
 
+
+  </div><!-- /.w-cards-grid -->
 
   <!-- 家族を追加カード -->
   <div class="w-add-card">
