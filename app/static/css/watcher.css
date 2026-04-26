@@ -1,0 +1,432 @@
+/* ==============================================
+   watcher.css — 子（見守り担当）画面専用スタイル
+   ============================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+/* --- CSS変数 --- */
+:root {
+  --primary:           #006269;
+  --primary-dark:      #004f55;
+  --primary-light:     #dbfbff;
+  --danger:            #b7131a;
+  --danger-bg:         #ffdad6;
+  --warning-bg:        #fff3cd;
+  --warning-text:      #856404;
+  --bg:                #f3faff;
+  --surface:           #ffffff;
+  --surface-low:       #e6f6ff;
+  --on-surface:        #071e27;
+  --on-surface-muted:  #3e494a;
+  --outline:           #6e797a;
+  --outline-variant:   #bdc9ca;
+  --radius-sm:  0.25rem;
+  --radius:     0.5rem;
+  --radius-md:  0.75rem;
+  --radius-lg:  1rem;
+  --radius-xl:  1.5rem;
+  --radius-full: 9999px;
+}
+
+/* --- ベースリセット --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  background-color: var(--bg);
+  color: var(--on-surface);
+  min-height: 100vh;
+  padding-bottom: 80px; /* ボトムナビ分 */
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* --- アラート色（base.cssと共有予定） --- */
+.alert-0 { background-color: #e0e0e0; color: #555; }
+.alert-1 { background-color: #d4edda; color: #155724; }
+.alert-2 { background-color: #fff3cd; color: #856404; }
+.alert-3 { background-color: #f8d7da; color: #721c24; }
+
+/* --- テキスト色ユーティリティ --- */
+.text-danger  { color: var(--danger); }
+.text-warning { color: var(--warning-text); }
+.text-success { color: #155724; }
+.text-muted   { color: var(--on-surface-muted); }
+
+/* ==============================
+   ヘッダー
+   ============================== */
+.w-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--outline-variant);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.w-header__logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary);
+}
+.w-header__actions { display: flex; gap: 20px; }
+.w-header__icon {
+  font-size: 20px;
+  color: var(--on-surface-muted);
+  cursor: pointer;
+}
+
+/* ==============================
+   メインコンテナ
+   ============================== */
+.w-container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 24px 24px 16px;
+}
+
+.w-page-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.w-page-subtitle {
+  font-size: 14px;
+  color: var(--on-surface-muted);
+  margin-bottom: 24px;
+}
+
+/* ==============================
+   アラートバナー
+   ============================== */
+.w-alert-banner {
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.w-alert-banner--danger {
+  background-color: var(--danger-bg);
+  border-left: 4px solid var(--danger);
+}
+.w-alert-banner--warning {
+  background-color: var(--warning-bg);
+  border-left: 4px solid #f59e0b;
+}
+.w-alert-banner__icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+.w-alert-banner__title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.w-alert-banner__body {
+  font-size: 14px;
+  color: var(--on-surface-muted);
+  line-height: 1.6;
+}
+
+/* ==============================
+   アバター
+   ============================== */
+.w-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--surface-low);
+  border: 2px solid var(--outline-variant);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+.w-avatar--lg {
+  width: 64px;
+  height: 64px;
+  font-size: 30px;
+}
+
+/* ==============================
+   親カード（ダッシュボード）
+   ============================== */
+.w-parent-card {
+  background: var(--surface);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0, 98, 105, 0.07);
+}
+.w-parent-card__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.w-parent-card__name { font-size: 18px; font-weight: 700; }
+.w-parent-card__meta { font-size: 13px; color: var(--on-surface-muted); margin-top: 2px; }
+
+/* アラートバッジ */
+.w-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.w-badge--alert-0 { background: #e0e0e0; color: #555; }
+.w-badge--alert-1 { background: #d4edda; color: #155724; }
+.w-badge--alert-2 { background: var(--warning-bg); color: var(--warning-text); }
+.w-badge--alert-3 { background: var(--danger-bg); color: var(--danger); }
+
+/* スタット行（カード内） */
+.w-stat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.w-stat-item {
+  background: var(--bg);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.w-stat-item__icon { font-size: 18px; flex-shrink: 0; }
+.w-stat-item__body { flex: 1; }
+.w-stat-item__label { font-size: 12px; color: var(--on-surface-muted); margin-bottom: 2px; }
+.w-stat-item__value {
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+}
+.w-stat-item__value--text { font-family: 'Noto Sans JP', sans-serif; font-size: 16px; }
+
+/* ==============================
+   ボタン
+   ============================== */
+.w-btn-call {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 60px;
+  padding: 0 24px;
+  border: none;
+  border-radius: var(--radius-xl);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.15s, transform 0.1s;
+  letter-spacing: 0.02em;
+}
+.w-btn-call:active { opacity: 0.85; transform: scale(0.99); }
+
+.w-btn-call--primary { background: var(--primary); color: white; }
+.w-btn-call--danger  { background: var(--danger);  color: white; }
+.w-btn-call--outline {
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+
+/* ==============================
+   「家族を追加」カード
+   ============================== */
+.w-add-card {
+  border: 2px dashed var(--outline-variant);
+  border-radius: var(--radius-lg);
+  padding: 32px 20px;
+  text-align: center;
+  color: var(--on-surface-muted);
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.w-add-card:hover { border-color: var(--primary); }
+.w-add-card__icon  { font-size: 28px; margin-bottom: 8px; }
+.w-add-card__label { font-size: 16px; font-weight: 500; color: var(--primary); }
+.w-add-card__sub   { font-size: 13px; margin-top: 4px; }
+
+/* ==============================
+   ボトムナビ
+   ============================== */
+.w-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  background: var(--surface);
+  border-top: 1px solid var(--outline-variant);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 100;
+}
+.w-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 60px;
+  padding: 8px;
+  color: var(--on-surface-muted);
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: var(--radius);
+  transition: color 0.15s;
+}
+.w-nav-item--active { color: var(--primary); }
+.w-nav-item__icon { font-size: 22px; line-height: 1; }
+
+/* ==============================
+   親詳細画面
+   ============================== */
+.w-detail-profile {
+  background: var(--surface);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.w-detail-profile__name {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.w-detail-profile__sub { font-size: 13px; color: var(--on-surface-muted); }
+
+/* スタットチップ（3列グリッド） */
+.w-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.w-stats-chip {
+  background: var(--surface);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius);
+  padding: 14px 10px;
+  text-align: center;
+}
+.w-stats-chip--danger {
+  background: var(--danger-bg);
+  border-color: #ffb4ac;
+}
+.w-stats-chip--warning {
+  background: var(--warning-bg);
+  border-color: #f0c040;
+}
+.w-stats-chip__label {
+  font-size: 11px;
+  color: var(--on-surface-muted);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.w-stats-chip__value {
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.w-stats-chip__unit { font-size: 12px; font-weight: 400; }
+.w-stats-chip--danger  .w-stats-chip__value { color: var(--danger); }
+.w-stats-chip--warning .w-stats-chip__value { color: var(--warning-text); }
+
+/* ==============================
+   測定履歴テーブル
+   ============================== */
+.w-table-section { margin-bottom: 96px; }
+.w-table-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.w-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  font-size: 14px;
+}
+.w-table th {
+  background: var(--surface-low);
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--on-surface-muted);
+  text-align: left;
+  border-bottom: 1px solid var(--outline-variant);
+}
+.w-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--outline-variant);
+  vertical-align: middle;
+}
+.w-table tr:last-child td { border-bottom: none; }
+.w-table__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ==============================
+   電話ボタン（詳細画面・固定）
+   ============================== */
+.w-call-fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 24px 20px;
+  background: linear-gradient(to top, var(--bg) 75%, transparent);
+  z-index: 50;
+}
+
+/* ==============================
+   レスポンシブ（タブレット〜PC）
+   ============================== */
+@media (min-width: 768px) {
+  body { padding-bottom: 0; }
+  .w-container {
+    max-width: 680px;
+    padding-top: 32px;
+  }
+  .w-bottom-nav { display: none; }
+  .w-call-fixed {
+    position: static;
+    padding: 0;
+    background: none;
+    margin-bottom: 32px;
+  }
+}
