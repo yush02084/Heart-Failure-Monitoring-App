@@ -1,0 +1,108 @@
+from flask import render_template, redirect, url_for, flash, session
+from flask_login import login_user, logout_user, login_required, current_user
+from app.auth import bp
+from app.auth.forms import LoginForm, RegisterWatcherForm
+from app.extensions import db, bcrypt
+from app.models import User, Invitation, WatchRelationship
+from app.core.tz import now_jst
+
+
+@bp.route("/login", methods=["GET", "POST"])
+def login():
+    if current_user.is_authenticated:
+        return _redirect_by_role(current_user)
+
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(
+            login_id=form.login_id.data
+        ).filter(User.deleted_at.is_(None)).first()
+
+        if user is None:
+            flash("ログインIDまたはPIN/パスワードが間違っています。", "error")
+            return render_template("auth/login.html", form=form)
+
+        # ロックアウト確認
+        if user.locked_until and user.locked_until > now_jst():
+            flash("アカウントがロックされています。しばらく後にお試しください。", "error")
+            return render_template("auth/login.html", form=form)
+
+        # パスワード照合
+        if bcrypt.check_password_hash(user.pin_hash, form.pin.data):
+            user.failed_attempts = 0
+            user.locked_until = None
+            db.session.commit()
+            login_user(user)
+            return _redirect_by_role(user)
+        else:
+            user.failed_attempts = (user.failed_attempts or 0) + 1
+            if user.failed_attempts >= 30:
+                from datetime import timedelta
+                user.locked_until = now_jst() + timedelta(hours=24)
+            elif user.failed_attempts >= 5:
+                from datetime import timedelta
+                user.locked_until = now_jst() + timedelta(minutes=15)
+            db.session.commit()
+            flash("ログインIDまたはPIN/パスワードが間違っています。", "error")
+
+    return render_template("auth/login.html", form=form)
+
+
+@bp.route("/logout", methods=["POST"])
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("auth.login"))
+
+
+@bp.route("/register/watcher/<token>", methods=["GET", "POST"])
+def register_watcher(token):
+    invitation = Invitation.query.filter_by(sharing_token=token).first()
+
+    if not invitation or not invitation.is_valid():
+        return render_template("auth/token_error.html"), 400
+
+    parent = invitation.parent
+    form = RegisterWatcherForm()
+    form.token.data = token
+
+    if form.validate_on_submit():
+        # login_id 重複チェック
+        if User.query.filter_by(login_id=form.login_id.data).first():
+            flash("このログインIDはすでに使われています。", "error")
+            return render_template("auth/register_watcher.html", form=form, parent_name=parent.name)
+
+        # トランザクション
+        pw_hash = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
+        watcher = User(
+            login_id=form.login_id.data,
+            pin_hash=pw_hash,
+            role="watcher",
+            name=form.name.data,
+            email=form.email.data,
+            phone_number=form.phone_number.data or None,
+        )
+        db.session.add(watcher)
+        db.session.flush()  # watcher.id を取得
+
+        rel = WatchRelationship(
+            parent_user_id=invitation.parent_user_id,
+            watcher_user_id=watcher.id,
+            status="active",
+            accepted_at=now_jst(),
+        )
+        db.session.add(rel)
+
+        invitation.used_at = now_jst()
+        db.session.commit()
+
+        login_user(watcher)
+        return redirect(url_for("watcher.dashboard"))
+
+    return render_template("auth/register_watcher.html", form=form, parent_name=parent.name, token=token)
+
+
+def _redirect_by_role(user):
+    if user.role == "parent":
+        return redirect(url_for("auth.login"))  # 親画面は未実装（仮）
+    return redirect(url_for("watcher.dashboard"))
