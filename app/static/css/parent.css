@@ -83,7 +83,8 @@ body { font-family: 'Noto Sans JP', sans-serif; font-size: 18px; background: var
 .p-input-section__title { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
 
 /* 体重表示 */
-.p-weight-display { font-family: 'Inter', sans-serif; font-size: 52px; font-weight: 700; color: var(--primary); text-align: center; padding: 16px 0; letter-spacing: 2px; }
+.p-weight-display { font-family: 'Inter', sans-serif; font-size: 52px; font-weight: 700; color: var(--primary); text-align: center; padding: 16px 0 4px; letter-spacing: 2px; }
+.p-weight-hint { font-size: 12px; color: var(--on-surface-muted); text-align: center; margin-bottom: 16px; }
 
 /* テンキー */
 .p-numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
@@ -97,7 +98,7 @@ body { font-family: 'Noto Sans JP', sans-serif; font-size: 18px; background: var
 .p-breath-choice { display: flex; align-items: center; gap: 14px; min-height: 60px; padding: 0 16px; background: var(--surface-low); border: 1.5px solid var(--outline-variant); border-radius: var(--radius-lg); cursor: pointer; font-size: 18px; font-weight: 500; }
 .p-breath-choice input[type="radio"] { width: 24px; height: 24px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0; }
 .p-breath-choice--warn { background: var(--warn-bg); border-color: var(--warning-border); }
-.p-breath-choice:has(input:checked) { border-color: var(--primary); background: var(--surface-low); }
+.p-breath-choice:has(input:checked) { border-color: var(--primary); border-width: 2px; background: #e0f5f5; }
 
 /* お知らせ */
 .p-notice { padding: 12px 16px; border-radius: var(--radius); font-size: 15px; margin-bottom: 16px; }

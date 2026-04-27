@@ -17,7 +17,7 @@
 <main class="w-container">
 
   {% if today_alert.level >= 2 %}
-  <div class="w-alert-banner w-alert-banner--{% if today_alert.level == 3 %}danger{% else %}warning{% endif %}">
+  <div class="w-alert-banner w-alert-banner--{% if today_alert.level == 3 %}danger{% else %}warning{% endif %}" role="alert">
     <span class="w-alert-banner__icon">⚠️</span>
     <div>
       <div class="w-alert-banner__title">

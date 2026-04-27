@@ -18,6 +18,8 @@
 
   {% if existing %}
   <div class="p-notice p-notice--info">今日の記録を修正します</div>
+  {% else %}
+  <div class="p-notice p-notice--info">今日はまだ記録がありません。体重と息切れを入力してください。</div>
   {% endif %}
 
   <form method="POST" action="{{ url_for('parent.input') }}" class="p-input-form">
@@ -30,6 +32,7 @@
       <div class="p-weight-display" id="weight-display">
         {{ form.weight.data or "- - -" }} kg
       </div>
+      <div class="p-weight-hint">例: 65.3 kg ／ 小数点以下1桁まで</div>
 
       <!-- テンキー -->
       <div class="p-numpad" role="group" aria-label="体重入力テンキー">
