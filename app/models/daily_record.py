@@ -19,6 +19,8 @@ class DailyRecord(db.Model):
 
     __table_args__ = (
         db.UniqueConstraint("parent_user_id", "record_date"),
+        db.Index("ix_dr_parent_user_id", "parent_user_id"),
+        db.Index("ix_dr_record_date", "record_date"),
     )
 
     def to_dict(self, base_weight: float = None):

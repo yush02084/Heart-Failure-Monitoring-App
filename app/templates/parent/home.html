@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}ホーム — 心不全見守り{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/parent.css') }}">
+{% endblock %}
+
+{% block content %}
+<header class="p-header">
+  <div class="p-header__logo">🫀 心不全見守り</div>
+  <div class="p-header__name">{{ user.name }} さん</div>
+</header>
+
+<main class="p-container">
+  <h1 class="p-page-title">今日の記録</h1>
+
+  {% if today_record %}
+  <div class="p-today-card p-today-card--done">
+    <div class="p-today-card__icon">✅</div>
+    <div class="p-today-card__body">
+      <div class="p-today-card__label">今日の入力が完了しています</div>
+      <div class="p-today-card__stats">
+        体重 <strong>{{ "%.1f"|format(today_record.weight) }} kg</strong> ／
+        息切れ <strong>{{ today_record.breath_label }}</strong>
+      </div>
+    </div>
+    <a href="{{ url_for('parent.input') }}" class="p-btn p-btn--outline p-btn--sm">修正</a>
+  </div>
+  {% else %}
+  <div class="p-today-card p-today-card--pending">
+    <div class="p-today-card__icon">📋</div>
+    <div class="p-today-card__body">
+      <div class="p-today-card__label">今日の記録がまだです</div>
+      <div class="p-today-card__sub">毎日の記録が大切です</div>
+    </div>
+  </div>
+  <a href="{{ url_for('parent.input') }}" class="p-btn p-btn--primary p-btn--lg">
+    📝 今日の体重・息切れを入力する
+  </a>
+  {% endif %}
+
+  {% if recent_records %}
+  <section class="p-section">
+    <h2 class="p-section-title">過去7日の記録</h2>
+    <table class="p-table">
+      <thead>
+        <tr>
+          <th>日付</th>
+          <th>体重</th>
+          <th>息切れ</th>
+          <th>状態</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in recent_records %}
+        <tr>
+          <td>{{ r.date_str }}</td>
+          <td style="font-family:'Inter',sans-serif; font-weight:600;">{{ "%.1f"|format(r.weight) }} kg</td>
+          <td>{{ r.breath_label }}</td>
+          <td><span class="p-status {{ r.alert_color_class }}">{{ r.alert_emoji }} {{ r.alert_label }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  {% endif %}
+
+</main>
+
+<nav class="p-bottom-nav">
+  <a href="{{ url_for('parent.home') }}" class="p-nav-item p-nav-item--active">
+    <span class="p-nav-item__icon">🏠</span>ホーム
+  </a>
+  <a href="{{ url_for('parent.input') }}" class="p-nav-item">
+    <span class="p-nav-item__icon">📝</span>記録する
+  </a>
+  <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="p-nav-item p-nav-item--btn">
+      <span class="p-nav-item__icon">🚪</span>ログアウト
+    </button>
+  </form>
+</nav>
+{% endblock %}

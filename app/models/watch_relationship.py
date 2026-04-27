@@ -16,4 +16,6 @@ class WatchRelationship(db.Model):
 
     __table_args__ = (
         db.UniqueConstraint("parent_user_id", "watcher_user_id"),
+        db.Index("ix_wr_watcher_user_id", "watcher_user_id"),
+        db.Index("ix_wr_parent_user_id", "parent_user_id"),
     )
