@@ -79,9 +79,13 @@ def input():
             )
             db.session.add(record)
 
-        db.session.commit()
-        flash("記録を保存しました。", "success")
-        return redirect(url_for("parent.home"))
+        try:
+            db.session.commit()
+            flash("記録を保存しました。", "success")
+            return redirect(url_for("parent.home"))
+        except Exception:
+            db.session.rollback()
+            flash("保存に失敗しました。しばらく後にお試しください。", "error")
 
     # GET 時: 既存データがあれば pre-fill
     if request.method == "GET" and existing:

@@ -27,9 +27,13 @@ class DailyRecord(db.Model):
         weight_diff = None
         weight_diff_str = "—"
         if base_weight is not None:
-            diff = self.weight - base_weight
-            weight_diff = round(diff, 1)
-            weight_diff_str = f"+{weight_diff}" if diff >= 0 else str(weight_diff)
+            weight_diff = round(self.weight - base_weight, 1)
+            if weight_diff > 0:
+                weight_diff_str = f"+{weight_diff}"
+            elif weight_diff < 0:
+                weight_diff_str = str(weight_diff)
+            else:
+                weight_diff_str = "±0.0"
 
         record_dt = self.record_date
         date_str = f"{record_dt.year}年{record_dt.month:02d}月{record_dt.day:02d}日"

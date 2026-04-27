@@ -10,6 +10,8 @@ def get_dashboard_context(watcher: User) -> dict:
     rels = (
         WatchRelationship.query
         .filter_by(watcher_user_id=watcher.id, status="active")
+        .join(WatchRelationship.parent)
+        .filter(User.deleted_at.is_(None))
         .options(joinedload(WatchRelationship.parent))
         .all()
     )
@@ -81,7 +83,7 @@ def get_parent_detail_context(watcher: User, parent_id: int) -> dict | None:
         watcher_user_id=watcher.id,
         parent_user_id=parent_id,
         status="active",
-    ).first()
+    ).options(joinedload(WatchRelationship.parent)).first()
     if not rel:
         return None
 

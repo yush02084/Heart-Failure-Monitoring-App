@@ -34,6 +34,12 @@ def create_app(config_class=Config):
     from flask import redirect, url_for
     from flask_login import current_user
 
+    @app.after_request
+    def set_security_headers(response):
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        return response
+
     @app.route("/")
     def index():
         if current_user.is_authenticated:

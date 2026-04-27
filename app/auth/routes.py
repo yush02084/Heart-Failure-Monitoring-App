@@ -77,8 +77,8 @@ def register_watcher(token):
     form.token.data = token
 
     if form.validate_on_submit():
-        # login_id 重複チェック
-        if User.query.filter_by(login_id=form.login_id.data).first():
+        # login_id 重複チェック（削除済みユーザーは除外）
+        if User.query.filter_by(login_id=form.login_id.data).filter(User.deleted_at.is_(None)).first():
             flash("このログインIDはすでに使われています。", "error")
             return render_template("auth/register_watcher.html", form=form, parent_name=parent.name)
 
@@ -104,7 +104,12 @@ def register_watcher(token):
         db.session.add(rel)
 
         invitation.used_at = now_jst()
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            flash("登録に失敗しました。しばらく後にお試しください。", "error")
+            return render_template("auth/register_watcher.html", form=form, parent_name=parent.name, token=token)
 
         login_user(watcher)
         return redirect(url_for("watcher.dashboard"))
