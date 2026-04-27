@@ -76,7 +76,12 @@
 
   function numpadPress(key) {
     if (key === '⌫') {
-      weightVal = weightVal.slice(0, -1);
+      // 自動挿入された小数点で終わっている場合は数字ごと2文字削除
+      if (weightVal.endsWith('.')) {
+        weightVal = weightVal.slice(0, -2);
+      } else {
+        weightVal = weightVal.slice(0, -1);
+      }
     } else if (key === '.') {
       if (!weightVal.includes('.')) weightVal += '.';
     } else {
