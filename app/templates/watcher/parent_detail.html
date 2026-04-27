@@ -1,118 +1,76 @@
-<!DOCTYPE html>
-<!--
-  parent_detail.html — 親詳細画面（子が見る）
-  Flask統合時: {% extends "base.html" %} に置き換え
-               CSS linkを {{ url_for('static', filename='css/watcher.css') }} に変更
--->
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Flask: <title>{{ parent.name }} — 心不全見守り</title> -->
-  <title>山田太郎 — 心不全見守り</title>
-  <link rel="stylesheet" href="../../static/css/watcher.css">
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}{{ parent.name }} — 心不全見守り{% endblock %}
 
-<!-- ==============================
-     ヘッダー
-     ============================== -->
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/watcher.css') }}">
+{% endblock %}
+
+{% block content %}
 <header class="w-header">
-  <div class="w-header__logo">
-    🫀 心不全見守り
-  </div>
+  <div class="w-header__logo">🫀 心不全見守り</div>
   <div class="w-header__actions">
     <span class="w-header__icon">🔔</span>
-    <!-- Flask: href="{{ url_for('watcher.dashboard') }}" -->
-    <a href="dashboard.html" class="w-header__icon" title="一覧に戻る">← 一覧</a>
+    <a href="{{ url_for('watcher.dashboard') }}" class="w-header__icon" title="一覧に戻る">← 一覧</a>
   </div>
 </header>
 
 <main class="w-container">
 
-  <!-- ==============================
-       アラートバナー（alert_level >= 2 のみ表示）
-       Flask: {% if today_alert.level >= 2 %} ... {% endif %}
-       ============================== -->
-  <!-- モックデータ: 警戒ケース（level=3）表示中 -->
-  <div class="w-alert-banner w-alert-banner--danger">
+  {% if today_alert.level >= 2 %}
+  <div class="w-alert-banner w-alert-banner--{% if today_alert.level == 3 %}danger{% else %}warning{% endif %}">
     <span class="w-alert-banner__icon">⚠️</span>
     <div>
-      <!-- Flask: {% if today_alert.level == 3 %}急激な変化を検知{% else %}体重増加を検知{% endif %} -->
-      <div class="w-alert-banner__title">急激な変化を検知</div>
+      <div class="w-alert-banner__title">
+        {% if today_alert.level == 3 %}急激な変化を検知{% else %}体重増加を検知{% endif %}
+      </div>
       <div class="w-alert-banner__body">
-        体重が急激に増加しています。心不全の兆候である可能性があります。
+        {% if today_alert.level == 3 %}
+          体重が急激に増加しています。心不全の兆候である可能性があります。
+        {% else %}
+          体重がやや増加しています。様子を確認してください。
+        {% endif %}
       </div>
     </div>
   </div>
-  <!-- 注意ケース（level=2）の場合:
-  <div class="w-alert-banner w-alert-banner--warning">
-    <span class="w-alert-banner__icon">⚠️</span>
-    <div>
-      <div class="w-alert-banner__title">体重増加を検知</div>
-      <div class="w-alert-banner__body">体重がやや増加しています。様子を確認してください。</div>
-    </div>
-  </div>
-  -->
+  {% endif %}
 
-  <!-- ==============================
-       プロフィール
-       Flask: {{ parent.name }}, {{ parent.phone_number }}
-       ============================== -->
   <div class="w-detail-profile">
     <div class="w-avatar w-avatar--lg">👴</div>
     <div class="w-detail-profile__info">
-      <div class="w-detail-profile__name">山田太郎 様</div>
-      <div class="w-detail-profile__sub">📞 090-1234-5678</div>
+      <div class="w-detail-profile__name">{{ parent.name }} 様</div>
+      {% if parent.phone_number %}
+      <div class="w-detail-profile__sub">📞 {{ parent.phone_number }}</div>
+      {% endif %}
     </div>
-    <!-- 電話ボタン（should_show_call_button=True のみ表示）-->
-    <!-- Flask: {% if today_alert.should_show_call_button %} -->
-    <a href="tel:+819012345678" class="w-btn-call w-btn-call--danger w-btn-call--compact">
+    {% if today_alert.should_show_call_button %}
+    <a href="{{ parent.tel_link }}" class="w-btn-call w-btn-call--danger w-btn-call--compact">
       📞 電話する
     </a>
-    <!-- Flask: {% endif %} -->
+    {% endif %}
   </div>
 
-  <!-- ==============================
-       今日のスタットチップ（3列）
-       Flask: recent_records[0] から取得
-       ============================== -->
+  {% if recent_records %}
+  {% set today = recent_records[0] %}
   <div class="w-stats-grid">
-
-    <!-- 最新体重 -->
-    <!-- Flask: {{ today.weight }} kg -->
     <div class="w-stats-chip">
       <div class="w-stats-chip__label">最新体重</div>
-      <div class="w-stats-chip__value">65.2<span class="w-stats-chip__unit"> kg</span></div>
+      <div class="w-stats-chip__value">{{ "%.1f"|format(today.weight) }}<span class="w-stats-chip__unit"> kg</span></div>
     </div>
-
-    <!-- 前日比（警戒: --danger、注意: --warning） -->
-    <!-- Flask: {% if today.weight_diff.startswith('+') and today.alert_level == 3 %}w-stats-chip--danger{% endif %} -->
-    <div class="w-stats-chip w-stats-chip--danger">
+    <div class="w-stats-chip {% if today.weight_diff and today.weight_diff > 0 and today.alert_level == 3 %}w-stats-chip--danger{% elif today.weight_diff and today.weight_diff > 0 and today.alert_level == 2 %}w-stats-chip--warning{% endif %}">
       <div class="w-stats-chip__label">前日比</div>
-      <!-- Flask: {{ today.weight_diff }} kg -->
-      <div class="w-stats-chip__value">+2.1<span class="w-stats-chip__unit"> kg</span></div>
-    </div>
-
-    <!-- 息切れ -->
-    <!-- Flask: breath_condition 3or4 → --danger, 2 → --warning -->
-    <div class="w-stats-chip w-stats-chip--danger">
-      <div class="w-stats-chip__label">息切れ</div>
-      <!-- Flask: {{ today.breath_label }} -->
-      <div class="w-stats-chip__value" style="font-size:15px; font-family:'Noto Sans JP',sans-serif;">
-        けっこう苦しい
+      <div class="w-stats-chip__value">
+        {{ today.weight_diff_str }}<span class="w-stats-chip__unit"> kg</span>
       </div>
     </div>
+    <div class="w-stats-chip {% if today.breath_condition >= 3 %}w-stats-chip--danger{% elif today.breath_condition == 2 %}w-stats-chip--warning{% endif %}">
+      <div class="w-stats-chip__label">息切れ</div>
+      <div class="w-stats-chip__value" style="font-size:15px; font-family:'Noto Sans JP',sans-serif;">{{ today.breath_label }}</div>
+    </div>
+  </div>
+  {% endif %}
 
-  </div><!-- /.w-stats-grid -->
-
-  <!-- ==============================
-       測定履歴テーブル（過去7日）
-       Flask: {% for r in recent_records %}
-       ============================== -->
   <section class="w-table-section">
     <h2 class="w-table-title">測定履歴</h2>
-
     <table class="w-table">
       <thead>
         <tr>
@@ -123,99 +81,28 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Flask: {% for r in recent_records %} -->
-
-        <!-- 2026/04/27 — 警戒 -->
+        {% for r in recent_records %}
         <tr>
-          <td>4/27(月)</td>
-          <td style="font-family:'Inter',sans-serif; font-weight:600;">65.2 kg</td>
-          <td class="text-danger">けっこう苦しい</td>
-          <td><span class="w-table__status alert-3">🔴 警戒</span></td>
+          <td>{{ r.date_str }}</td>
+          <td style="font-family:'Inter',sans-serif; font-weight:600;">{{ "%.1f"|format(r.weight) }} kg</td>
+          <td class="{% if r.breath_condition >= 3 %}text-danger{% elif r.breath_condition == 2 %}text-warning{% endif %}">{{ r.breath_label }}</td>
+          <td><span class="w-table__status {{ r.alert_color_class }}">{{ r.alert_emoji }} {{ r.alert_label }}</span></td>
         </tr>
-
-        <!-- 2026/04/26 — 注意 -->
-        <tr>
-          <td>4/26(日)</td>
-          <td style="font-family:'Inter',sans-serif; font-weight:600;">64.5 kg</td>
-          <td class="text-warning">ちょっと苦しい</td>
-          <td><span class="w-table__status alert-2">🟡 注意</span></td>
-        </tr>
-
-        <!-- 2026/04/25 — 通常 -->
-        <tr>
-          <td>4/25(土)</td>
-          <td style="font-family:'Inter',sans-serif; font-weight:600;">63.8 kg</td>
-          <td>普通</td>
-          <td><span class="w-table__status alert-1">🟢 通常</span></td>
-        </tr>
-
-        <!-- 2026/04/24 — 通常 -->
-        <tr>
-          <td>4/24(金)</td>
-          <td style="font-family:'Inter',sans-serif; font-weight:600;">63.7 kg</td>
-          <td>普通</td>
-          <td><span class="w-table__status alert-1">🟢 通常</span></td>
-        </tr>
-
-        <!-- 2026/04/23 — 通常 -->
-        <tr>
-          <td>4/23(木)</td>
-          <td style="font-family:'Inter',sans-serif; font-weight:600;">63.9 kg</td>
-          <td>普通</td>
-          <td><span class="w-table__status alert-1">🟢 通常</span></td>
-        </tr>
-
-        <!-- 2026/04/22 — 通常 -->
-        <tr>
-          <td>4/22(水)</td>
-          <td style="font-family:'Inter',sans-serif; font-weight:600;">63.6 kg</td>
-          <td>普通</td>
-          <td><span class="w-table__status alert-1">🟢 通常</span></td>
-        </tr>
-
-        <!-- 2026/04/21 — 通常 -->
-        <tr>
-          <td>4/21(火)</td>
-          <td style="font-family:'Inter',sans-serif; font-weight:600;">63.5 kg</td>
-          <td>普通</td>
-          <td><span class="w-table__status alert-1">🟢 通常</span></td>
-        </tr>
-
-        <!-- Flask: {% endfor %} -->
+        {% else %}
+        <tr><td colspan="4" style="text-align:center; color: var(--outline); padding: 24px;">記録なし</td></tr>
+        {% endfor %}
       </tbody>
     </table>
-
   </section>
 
 </main>
 
-<!-- ==============================
-     電話ボタン固定（should_show_call_button = True のみ表示）
-     Flask: {% if today_alert.should_show_call_button %}
-     ============================== -->
-<!-- 固定電話ボタンはプロフィールカード内に移動済み -->
-
-<!-- ==============================
-     ボトムナビ
-     ============================== -->
 <nav class="w-bottom-nav">
-  <a href="dashboard.html" class="w-nav-item">
-    <span class="w-nav-item__icon">⊞</span>
-    ダッシュボード
+  <a href="{{ url_for('watcher.dashboard') }}" class="w-nav-item">
+    <span class="w-nav-item__icon">⊞</span>ダッシュボード
   </a>
-  <a href="#" class="w-nav-item w-nav-item--active">
-    <span class="w-nav-item__icon">📊</span>
-    生体データ
-  </a>
-  <a href="#" class="w-nav-item">
-    <span class="w-nav-item__icon">🔔</span>
-    通知
-  </a>
-  <a href="#" class="w-nav-item">
-    <span class="w-nav-item__icon">⚙️</span>
-    設定
-  </a>
+  <a href="#" class="w-nav-item w-nav-item--active"><span class="w-nav-item__icon">📊</span>生体データ</a>
+  <a href="#" class="w-nav-item"><span class="w-nav-item__icon">🔔</span>通知</a>
+  <a href="#" class="w-nav-item"><span class="w-nav-item__icon">⚙️</span>設定</a>
 </nav>
-
-</body>
-</html>
+{% endblock %}

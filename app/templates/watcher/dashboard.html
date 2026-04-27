@@ -1,206 +1,97 @@
-<!DOCTYPE html>
-<!--
-  dashboard.html — 子（見守り担当）ダッシュボード
-  Flask統合時: {% extends "base.html" %} に置き換え、
-               CSS linkを {{ url_for('static', filename='css/watcher.css') }} に変更
--->
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ダッシュボード — 心不全見守り</title>
-  <!-- スタンドアロンプレビュー用（Flask統合後は url_for に差し替え） -->
-  <link rel="stylesheet" href="../../static/css/watcher.css">
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}ダッシュボード — 心不全見守り{% endblock %}
 
-<!-- ==============================
-     ヘッダー
-     ============================== -->
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/watcher.css') }}">
+{% endblock %}
+
+{% block content %}
 <header class="w-header">
-  <div class="w-header__logo">
-    🫀 心不全見守り
-  </div>
+  <div class="w-header__logo">🫀 心不全見守り</div>
   <div class="w-header__actions">
-    <!-- 通知アイコン（将来: 未読バッジ） -->
     <span class="w-header__icon" title="通知">🔔</span>
     <span class="w-header__icon" title="アカウント">👤</span>
   </div>
 </header>
 
-<!-- ==============================
-     メインコンテンツ
-     Flask統合後: watched_parents ループに差し替え
-     ============================== -->
 <main class="w-container">
-
   <h1 class="w-page-title">見守り対象</h1>
   <p class="w-page-subtitle">最新の健康状態を監視しています。</p>
 
-  <!-- PC: 2列グリッド wrapper（Flask: {% for p in watched_parents %} をこの中に） -->
   <div class="w-cards-grid">
+    {% for p in watched_parents %}
+    <div class="w-parent-card">
 
-  <!-- ===================================
-       親カード ×1（モックデータ: 警戒ケース）
-       Flask統合後: {% for p in watched_parents %} でループ
-       =================================== -->
-  <div class="w-parent-card">
-
-    <!-- プロフィール -->
-    <div class="w-parent-card__header">
-      <div class="w-avatar">👴</div>
-      <div>
-        <!-- Flask: {{ p.parent_name }} -->
-        <div class="w-parent-card__name">山田太郎</div>
-        <div class="w-parent-card__meta">見守り中</div>
-      </div>
-    </div>
-
-    <!-- アラートバッジ -->
-    <!-- Flask: class="w-badge w-badge--alert-{{ p.alert_level }}" -->
-    <!-- Flask: {{ p.alert_emoji }} {{ p.alert_label }} -->
-    <div class="w-badge w-badge--alert-3">🔴 警戒</div>
-
-    <!-- スタット -->
-    <div class="w-stat-row">
-
-      <!-- 体重変化 -->
-      <div class="w-stat-item">
-        <span class="w-stat-item__icon">⚖️</span>
-        <div class="w-stat-item__body">
-          <div class="w-stat-item__label">体重変化（過去3日）</div>
-          <!-- Flask: {{ p.latest_record.weight_diff }} kg -->
-          <div class="w-stat-item__value text-danger">+2.1 kg ↑</div>
+      <div class="w-parent-card__header">
+        <div class="w-avatar">👴</div>
+        <div>
+          <div class="w-parent-card__name">{{ p.parent_name }}</div>
+          <div class="w-parent-card__meta">見守り中</div>
         </div>
       </div>
 
-      <!-- 息切れ -->
-      <div class="w-stat-item">
-        <span class="w-stat-item__icon">🌬️</span>
-        <div class="w-stat-item__body">
-          <div class="w-stat-item__label">息切れの状態</div>
-          <!-- Flask: {{ p.latest_record.breath_label }} -->
-          <div class="w-stat-item__value w-stat-item__value--text text-danger">けっこう苦しい</div>
+      <div class="w-badge w-badge--alert-{{ p.alert_level }}">{{ p.alert_emoji }} {{ p.alert_label }}</div>
+
+      <div class="w-stat-row">
+        {% if p.latest_record %}
+        <div class="w-stat-item">
+          <span class="w-stat-item__icon">⚖️</span>
+          <div class="w-stat-item__body">
+            <div class="w-stat-item__label">体重変化（過去3日）</div>
+            <div class="w-stat-item__value {% if p.latest_record.weight_diff and p.latest_record.weight_diff > 0 %}text-danger{% endif %}">
+              {{ p.latest_record.weight_diff_str }} kg
+            </div>
+          </div>
+        </div>
+        <div class="w-stat-item">
+          <span class="w-stat-item__icon">🌬️</span>
+          <div class="w-stat-item__body">
+            <div class="w-stat-item__label">息切れの状態</div>
+            <div class="w-stat-item__value w-stat-item__value--text {% if p.latest_record.breath_condition >= 3 %}text-danger{% elif p.latest_record.breath_condition == 2 %}text-warning{% endif %}">
+              {{ p.latest_record.breath_label }}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        <div class="w-stat-item">
+          <span class="w-stat-item__icon">🕐</span>
+          <div class="w-stat-item__body">
+            <div class="w-stat-item__label">最終記録日</div>
+            <div class="w-stat-item__value w-stat-item__value--text">{{ p.last_input_date_str }}</div>
+          </div>
         </div>
       </div>
 
-      <!-- 最終記録 -->
-      <div class="w-stat-item">
-        <span class="w-stat-item__icon">🕐</span>
-        <div class="w-stat-item__body">
-          <div class="w-stat-item__label">最終記録日</div>
-          <!-- Flask: {{ p.last_input_date_str }} -->
-          <div class="w-stat-item__value w-stat-item__value--text">2026年04月27日</div>
-        </div>
-      </div>
-
-    </div><!-- /.w-stat-row -->
-
-    <!-- ボタン行 -->
-    <div class="w-card-actions">
-      <!-- 詳細ボタン（常時表示） -->
-      <!-- Flask: href="{{ url_for('watcher.parent_detail', parent_id=p.parent_id) }}" -->
-      <a href="parent_detail.html" class="w-btn-call w-btn-call--outline w-btn-call--sm">
-        📋 詳細を見る
-      </a>
-      <!-- 電話ボタン（alert_level >= 2 のみ表示） -->
-      <!-- Flask: {% if p.alert_level >= 2 %} -->
-      <a href="tel:+819012345678" class="w-btn-call w-btn-call--danger w-btn-call--sm">
-        📞 電話する
-      </a>
-      <!-- Flask: {% endif %} -->
-    </div>
-
-  </div><!-- /.w-parent-card（警戒ケース） -->
-
-
-  <!-- ===================================
-       親カード ×2（モックデータ: 通常ケース）
-       =================================== -->
-  <div class="w-parent-card">
-
-    <div class="w-parent-card__header">
-      <div class="w-avatar">👵</div>
-      <div>
-        <div class="w-parent-card__name">山田花子</div>
-        <div class="w-parent-card__meta">見守り中</div>
-      </div>
-    </div>
-
-    <div class="w-badge w-badge--alert-1">🟢 通常</div>
-
-    <div class="w-stat-row">
-
-      <div class="w-stat-item">
-        <span class="w-stat-item__icon">⚖️</span>
-        <div class="w-stat-item__body">
-          <div class="w-stat-item__label">体重変化（過去3日）</div>
-          <div class="w-stat-item__value text-success">+0.2 kg</div>
-        </div>
-      </div>
-
-      <div class="w-stat-item">
-        <span class="w-stat-item__icon">🌬️</span>
-        <div class="w-stat-item__body">
-          <div class="w-stat-item__label">息切れの状態</div>
-          <div class="w-stat-item__value w-stat-item__value--text text-success">普通</div>
-        </div>
-      </div>
-
-      <div class="w-stat-item">
-        <span class="w-stat-item__icon">🕐</span>
-        <div class="w-stat-item__body">
-          <div class="w-stat-item__label">最終記録日</div>
-          <div class="w-stat-item__value w-stat-item__value--text">2026年04月27日</div>
-        </div>
+      <div class="w-card-actions">
+        <a href="{{ url_for('watcher.parent_detail', parent_id=p.parent_id) }}" class="w-btn-call w-btn-call--outline w-btn-call--sm">
+          📋 詳細を見る
+        </a>
+        {% if p.alert_level >= 2 %}
+        <a href="{{ p.tel_link }}" class="w-btn-call w-btn-call--danger w-btn-call--sm">
+          📞 電話する
+        </a>
+        {% endif %}
       </div>
 
     </div>
+    {% else %}
+    <p style="color: var(--on-surface-muted); text-align: center; padding: 32px 0; grid-column: span 2;">見守り対象はまだいません。</p>
+    {% endfor %}
+  </div>
 
-    <!-- ボタン行（通常: 詳細のみ） -->
-    <div class="w-card-actions">
-      <a href="parent_detail.html" class="w-btn-call w-btn-call--outline w-btn-call--sm">
-        📋 詳細を見る
-      </a>
-      <!-- 電話ボタンなし（alert_level=1 のため非表示） -->
-    </div>
-
-  </div><!-- /.w-parent-card（通常ケース） -->
-
-
-  </div><!-- /.w-cards-grid -->
-
-  <!-- 家族を追加カード -->
   <div class="w-add-card">
     <div class="w-add-card__icon">👥</div>
     <div class="w-add-card__label">その他の家族を追加</div>
     <div class="w-add-card__sub">見守り対象者を追加します</div>
   </div>
-
 </main>
 
-<!-- ==============================
-     ボトムナビ
-     Flask: url_for でリンク先を差し替え
-     ============================== -->
 <nav class="w-bottom-nav">
-  <a href="dashboard.html" class="w-nav-item w-nav-item--active">
-    <span class="w-nav-item__icon">⊞</span>
-    ダッシュボード
+  <a href="{{ url_for('watcher.dashboard') }}" class="w-nav-item w-nav-item--active">
+    <span class="w-nav-item__icon">⊞</span>ダッシュボード
   </a>
-  <a href="#" class="w-nav-item">
-    <span class="w-nav-item__icon">📊</span>
-    生体データ
-  </a>
-  <a href="#" class="w-nav-item">
-    <span class="w-nav-item__icon">🔔</span>
-    通知
-  </a>
-  <a href="#" class="w-nav-item">
-    <span class="w-nav-item__icon">⚙️</span>
-    設定
-  </a>
+  <a href="#" class="w-nav-item"><span class="w-nav-item__icon">📊</span>生体データ</a>
+  <a href="#" class="w-nav-item"><span class="w-nav-item__icon">🔔</span>通知</a>
+  <a href="#" class="w-nav-item"><span class="w-nav-item__icon">⚙️</span>設定</a>
 </nav>
-
-</body>
-</html>
+{% endblock %}

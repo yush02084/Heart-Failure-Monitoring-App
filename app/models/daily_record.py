@@ -38,7 +38,8 @@ class DailyRecord(db.Model):
             "date_str": date_str,
             "date_iso": record_dt.isoformat(),
             "weight": self.weight,
-            "weight_diff": weight_diff_str,
+            "weight_diff": weight_diff,       # float or None
+            "weight_diff_str": weight_diff_str,
             "breath_condition": self.breath_condition,
             "breath_label": BREATH_LABEL.get(self.breath_condition, "—"),
             "alert_level": self.alert_level,
