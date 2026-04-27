@@ -30,7 +30,8 @@
         </div>
       </div>
 
-      <div class="w-badge w-badge--alert-{{ p.alert_level }}">{{ p.alert_emoji }} {{ p.alert_label }}</div>
+      <div class="w-badge w-badge--alert-{{ p.alert_level }}"
+           aria-label="状態: {{ p.alert_label }}">{{ p.alert_emoji }} {{ p.alert_label }}</div>
 
       <div class="w-stat-row">
         {% if p.latest_record %}
@@ -75,7 +76,7 @@
 
     </div>
     {% else %}
-    <p style="color: var(--on-surface-muted); text-align: center; padding: 32px 0; grid-column: span 2;">見守り対象はまだいません。</p>
+    <p class="w-empty-state">見守り対象はまだいません。</p>
     {% endfor %}
   </div>
 

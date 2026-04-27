@@ -8,7 +8,16 @@
   --primary: #006269;
   --primary-dark: #004f55;
   --danger: #b7131a;
+  --danger-border: #ffb4ac;
   --warning: #856404;
+  --warning-border: #f0b445;
+  --success: #155724;
+  --success-bg: #d4edda;
+  --done-border: #6db68a;
+  --done-bg: #f0faf4;
+  --pending-border: #f0b445;
+  --pending-bg: #fffbf0;
+  --warn-bg: #fff8f0;
   --bg: #f3faff;
   --surface: #ffffff;
   --surface-low: #e6f6ff;
@@ -37,8 +46,8 @@ body { font-family: 'Noto Sans JP', sans-serif; font-size: 18px; background: var
 
 /* 今日のカード */
 .p-today-card { background: var(--surface); border: 1px solid var(--outline-variant); border-radius: var(--radius-lg); padding: 20px; display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
-.p-today-card--done { border-color: #6db68a; background: #f0faf4; }
-.p-today-card--pending { border-color: #f0b445; background: #fffbf0; }
+.p-today-card--done { border-color: var(--done-border); background: var(--done-bg); }
+.p-today-card--pending { border-color: var(--pending-border); background: var(--pending-bg); }
 .p-today-card__icon { font-size: 28px; flex-shrink: 0; }
 .p-today-card__body { flex: 1; }
 .p-today-card__label { font-size: 17px; font-weight: 700; }
@@ -63,8 +72,8 @@ body { font-family: 'Noto Sans JP', sans-serif; font-size: 18px; background: var
 .p-table td { padding: 14px 12px; font-size: 16px; border-bottom: 1px solid var(--outline-variant); }
 .p-table tr:last-child td { border-bottom: none; }
 .p-status { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 9999px; font-size: 13px; font-weight: 600; }
-.alert-0 { background: #e0e0e0; color: #555; }
-.alert-1 { background: #d4edda; color: #155724; }
+.alert-0 { background: #e0e0e0; color: #3a3a3a; } /* contrast 6.4:1 */
+.alert-1 { background: var(--success-bg); color: var(--success); }
 .alert-2 { background: #fff3cd; color: var(--warning); }
 .alert-3 { background: #f8d7da; color: var(--danger); }
 
@@ -80,13 +89,14 @@ body { font-family: 'Noto Sans JP', sans-serif; font-size: 18px; background: var
 .p-numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .p-numpad__key { min-height: 64px; background: var(--surface-low); border: 1px solid var(--outline-variant); border-radius: var(--radius); font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 600; color: var(--on-surface); cursor: pointer; transition: background 0.1s; }
 .p-numpad__key:active { background: var(--outline-variant); }
-.p-numpad__key--del { background: #f8d7da; color: var(--danger); border-color: #ffb4ac; }
+.p-numpad__key--del { background: #f8d7da; color: var(--danger); border-color: var(--danger-border); }
+.p-numpad__key:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
 
 /* 息切れ選択 */
 .p-breath-choices { display: flex; flex-direction: column; gap: 10px; }
 .p-breath-choice { display: flex; align-items: center; gap: 14px; min-height: 60px; padding: 0 16px; background: var(--surface-low); border: 1.5px solid var(--outline-variant); border-radius: var(--radius-lg); cursor: pointer; font-size: 18px; font-weight: 500; }
 .p-breath-choice input[type="radio"] { width: 24px; height: 24px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0; }
-.p-breath-choice--warn { background: #fff8f0; border-color: #f0b445; }
+.p-breath-choice--warn { background: var(--warn-bg); border-color: var(--warning-border); }
 .p-breath-choice:has(input:checked) { border-color: var(--primary); background: var(--surface-low); }
 
 /* お知らせ */
@@ -107,4 +117,20 @@ body { font-family: 'Noto Sans JP', sans-serif; font-size: 18px; background: var
   body { padding-bottom: 0; }
   .p-container { max-width: 720px; padding-top: 32px; }
   .p-bottom-nav { display: none; }
+}
+
+/* 小画面（320px）対応 */
+@media (max-width: 380px) {
+  body { font-size: 16px; }
+  .p-container { padding: 16px 12px; }
+  .p-header { padding: 10px 12px; }
+  .p-weight-display { font-size: 42px; }
+  .p-numpad__key { min-height: 56px; font-size: 20px; }
+  .p-table th, .p-table td { padding: 10px 8px; font-size: 14px; }
+}
+
+/* フォーカス共通 */
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
 }

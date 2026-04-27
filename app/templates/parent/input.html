@@ -74,7 +74,13 @@
 
 <script>
   let weightVal = "{{ form.weight.data or '' }}";
-  updateDisplay();
+  let displayEl, inputEl;
+
+  document.addEventListener('DOMContentLoaded', function () {
+    displayEl = document.getElementById('weight-display');
+    inputEl = document.getElementById('weight-input');
+    updateDisplay();
+  });
 
   function numpadPress(key) {
     if (key === '⌫') {
@@ -98,10 +104,9 @@
   }
 
   function updateDisplay() {
-    const display = document.getElementById('weight-display');
-    const input = document.getElementById('weight-input');
-    display.textContent = (weightVal || '- - -') + ' kg';
-    input.value = weightVal;
+    if (!displayEl) return;
+    displayEl.textContent = (weightVal || '- - -') + ' kg';
+    inputEl.value = weightVal;
   }
 </script>
 {% endblock %}

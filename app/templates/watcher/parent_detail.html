@@ -64,7 +64,7 @@
     </div>
     <div class="w-stats-chip {% if today.breath_condition >= 3 %}w-stats-chip--danger{% elif today.breath_condition == 2 %}w-stats-chip--warning{% endif %}">
       <div class="w-stats-chip__label">息切れ</div>
-      <div class="w-stats-chip__value" style="font-size:15px; font-family:'Noto Sans JP',sans-serif;">{{ today.breath_label }}</div>
+      <div class="w-stats-chip__value w-stats-chip__value--text">{{ today.breath_label }}</div>
     </div>
   </div>
   {% endif %}
@@ -84,12 +84,12 @@
         {% for r in recent_records %}
         <tr>
           <td>{{ r.date_str }}</td>
-          <td style="font-family:'Inter',sans-serif; font-weight:600;">{{ "%.1f"|format(r.weight) }} kg</td>
+          <td class="w-table__weight">{{ "%.1f"|format(r.weight) }} kg</td>
           <td class="{% if r.breath_condition >= 3 %}text-danger{% elif r.breath_condition == 2 %}text-warning{% endif %}">{{ r.breath_label }}</td>
           <td><span class="w-table__status {{ r.alert_color_class }}">{{ r.alert_emoji }} {{ r.alert_label }}</span></td>
         </tr>
         {% else %}
-        <tr><td colspan="4" style="text-align:center; color: var(--outline); padding: 24px;">記録なし</td></tr>
+        <tr><td colspan="4" class="w-table__empty">記録なし</td></tr>
         {% endfor %}
       </tbody>
     </table>
