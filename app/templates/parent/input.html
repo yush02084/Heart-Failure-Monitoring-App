@@ -82,6 +82,10 @@
     } else {
       if (weightVal.length >= 6) return;
       weightVal += key;
+      // 整数部が2桁になったら自動で小数点を挿入
+      if (!weightVal.includes('.') && weightVal.length === 2) {
+        weightVal += '.';
+      }
     }
     updateDisplay();
   }
