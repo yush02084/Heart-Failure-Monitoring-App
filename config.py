@@ -3,6 +3,8 @@ import secrets
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
+INSTANCE_DIR = BASE_DIR / "instance"
+INSTANCE_DIR.mkdir(exist_ok=True)  # git clone 直後でも instance/ がなければ自動作成
 
 
 class Config:
