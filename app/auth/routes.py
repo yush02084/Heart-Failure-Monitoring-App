@@ -18,7 +18,12 @@ def login():
             login_id=form.login_id.data
         ).filter(User.deleted_at.is_(None)).first()
 
+        # ユーザー不在でもbcryptを走らせてタイミング攻撃を防ぐ
         if user is None:
+            bcrypt.check_password_hash(
+                "$2b$12$invalidhashpadding000000000000000000000000000000000000",
+                form.pin.data,
+            )
             flash("ログインIDまたはPIN/パスワードが間違っています。", "error")
             return render_template("auth/login.html", form=form)
 
@@ -35,12 +40,11 @@ def login():
             login_user(user)
             return _redirect_by_role(user)
         else:
+            from datetime import timedelta
             user.failed_attempts = (user.failed_attempts or 0) + 1
-            if user.failed_attempts >= 30:
-                from datetime import timedelta
-                user.locked_until = now_jst() + timedelta(hours=24)
+            if user.failed_attempts >= 10:
+                user.locked_until = now_jst() + timedelta(hours=1)
             elif user.failed_attempts >= 5:
-                from datetime import timedelta
                 user.locked_until = now_jst() + timedelta(minutes=15)
             db.session.commit()
             flash("ログインIDまたはPIN/パスワードが間違っています。", "error")
@@ -104,5 +108,5 @@ def register_watcher(token):
 
 def _redirect_by_role(user):
     if user.role == "parent":
-        return redirect(url_for("auth.login"))  # 親画面は未実装（仮）
+        return redirect(url_for("parent.home"))
     return redirect(url_for("watcher.dashboard"))

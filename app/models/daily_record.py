@@ -35,6 +35,7 @@ class DailyRecord(db.Model):
         record_dt = self.record_date
         date_str = f"{record_dt.year}年{record_dt.month:02d}月{record_dt.day:02d}日"
 
+        level = self.alert_level if self.alert_level in ALERT_EMOJI else 0
         return {
             "id": self.id,
             "date_str": date_str,
@@ -44,8 +45,8 @@ class DailyRecord(db.Model):
             "weight_diff_str": weight_diff_str,
             "breath_condition": self.breath_condition,
             "breath_label": BREATH_LABEL.get(self.breath_condition, "—"),
-            "alert_level": self.alert_level,
-            "alert_emoji": ALERT_EMOJI[self.alert_level],
-            "alert_color_class": ALERT_COLOR_CLASS[self.alert_level],
-            "alert_label": ALERT_LABEL[self.alert_level],
+            "alert_level": level,
+            "alert_emoji": ALERT_EMOJI[level],
+            "alert_color_class": ALERT_COLOR_CLASS[level],
+            "alert_label": ALERT_LABEL[level],
         }

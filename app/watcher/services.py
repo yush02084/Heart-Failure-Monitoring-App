@@ -1,4 +1,6 @@
 from datetime import timedelta
+from sqlalchemy.orm import joinedload
+from app.extensions import db
 from app.models import User, WatchRelationship, DailyRecord
 from app.core.tz import today_jst
 from app.core.alert_logic import ALERT_EMOJI, ALERT_LABEL, ALERT_COLOR_CLASS
@@ -6,22 +8,43 @@ from app.core.alert_logic import ALERT_EMOJI, ALERT_LABEL, ALERT_COLOR_CLASS
 
 def get_dashboard_context(watcher: User) -> dict:
     """watcherダッシュボード用データを組み立てる"""
-    rels = WatchRelationship.query.filter_by(
-        watcher_user_id=watcher.id, status="active"
-    ).all()
+    rels = (
+        WatchRelationship.query
+        .filter_by(watcher_user_id=watcher.id, status="active")
+        .options(joinedload(WatchRelationship.parent))
+        .all()
+    )
+
+    # 監視対象の親IDリストを一括取得してN+1を回避
+    parent_ids = [rel.parent_user_id for rel in rels]
+    latest_map: dict[int, DailyRecord] = {}
+    if parent_ids:
+        # 各親の最新レコードをサブクエリで一括取得
+        from sqlalchemy import func
+        subq = (
+            db.session.query(
+                DailyRecord.parent_user_id,
+                func.max(DailyRecord.record_date).label("max_date"),
+            )
+            .filter(DailyRecord.parent_user_id.in_(parent_ids))
+            .filter(DailyRecord.deleted_at.is_(None))
+            .group_by(DailyRecord.parent_user_id)
+            .subquery()
+        )
+        latest_records = (
+            db.session.query(DailyRecord)
+            .join(subq, (DailyRecord.parent_user_id == subq.c.parent_user_id)
+                  & (DailyRecord.record_date == subq.c.max_date))
+            .all()
+        )
+        latest_map = {r.parent_user_id: r for r in latest_records}
 
     watched_parents = []
     today = today_jst()
 
     for rel in rels:
         parent = rel.parent
-        latest = (
-            DailyRecord.query
-            .filter_by(parent_user_id=parent.id)
-            .filter(DailyRecord.deleted_at.is_(None))
-            .order_by(DailyRecord.record_date.desc())
-            .first()
-        )
+        latest = latest_map.get(parent.id)
 
         if latest:
             days_since = (today - latest.record_date).days

@@ -1,5 +1,5 @@
 from flask import Flask
-from app.extensions import db, login_manager, bcrypt, migrate
+from app.extensions import db, login_manager, bcrypt, migrate, csrf
 from config import Config
 
 
@@ -12,6 +12,7 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     bcrypt.init_app(app)
     migrate.init_app(app, db)
+    csrf.init_app(app)
 
     # Flask-Login ユーザーローダー
     from app.models.user import User

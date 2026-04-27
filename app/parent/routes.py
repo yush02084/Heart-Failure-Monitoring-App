@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from app.parent import bp
 from app.parent.forms import DailyInputForm
@@ -84,7 +84,7 @@ def input():
         return redirect(url_for("parent.home"))
 
     # GET 時: 既存データがあれば pre-fill
-    if request_is_get() and existing:
+    if request.method == "GET" and existing:
         form.weight.data = existing.weight
         form.breath_condition.data = existing.breath_condition
 
@@ -94,8 +94,3 @@ def input():
         today_str=f"{today.year}年{today.month:02d}月{today.day:02d}日（今日）",
         existing=existing is not None,
     )
-
-
-def request_is_get():
-    from flask import request
-    return request.method == "GET"
