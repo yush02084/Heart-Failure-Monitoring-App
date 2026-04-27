@@ -32,9 +32,11 @@
       </div>
 
       <!-- テンキー -->
-      <div class="p-numpad">
+      <div class="p-numpad" role="group" aria-label="体重入力テンキー">
         {% for digit in ['7','8','9','4','5','6','1','2','3','.','0','⌫'] %}
-        <button type="button" class="p-numpad__key {% if digit == '⌫' %}p-numpad__key--del{% endif %}"
+        <button type="button"
+                class="p-numpad__key {% if digit == '⌫' %}p-numpad__key--del{% endif %}"
+                aria-label="{% if digit == '⌫' %}削除{% elif digit == '.' %}小数点{% else %}数字 {{ digit }}{% endif %}"
                 onclick="numpadPress('{{ digit }}')">
           {{ digit }}
         </button>

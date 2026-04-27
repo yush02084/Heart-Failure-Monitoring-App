@@ -9,8 +9,8 @@
 <header class="w-header">
   <div class="w-header__logo">🫀 心不全見守り</div>
   <div class="w-header__actions">
-    <span class="w-header__icon">🔔</span>
-    <a href="{{ url_for('watcher.dashboard') }}" class="w-header__icon" title="一覧に戻る">← 一覧</a>
+    <button class="w-header__icon" aria-label="通知" title="通知">🔔</button>
+    <a href="{{ url_for('watcher.dashboard') }}" class="w-header__icon" aria-label="一覧に戻る" title="一覧に戻る">← 一覧</a>
   </div>
 </header>
 
@@ -74,10 +74,10 @@
     <table class="w-table">
       <thead>
         <tr>
-          <th>日付</th>
-          <th>体重</th>
-          <th>息切れ</th>
-          <th>状態</th>
+          <th scope="col">日付</th>
+          <th scope="col">体重</th>
+          <th scope="col">息切れ</th>
+          <th scope="col">状態</th>
         </tr>
       </thead>
       <tbody>

@@ -44,7 +44,7 @@ body {
 a { color: inherit; text-decoration: none; }
 
 /* --- アラート色（base.cssと共有予定） --- */
-.alert-0 { background-color: #e0e0e0; color: #555; }
+.alert-0 { background-color: #e0e0e0; color: #3a3a3a; } /* contrast 6.4:1 (WCAG AA) */
 .alert-1 { background-color: #d4edda; color: #155724; }
 .alert-2 { background-color: #fff3cd; color: #856404; }
 .alert-3 { background-color: #f8d7da; color: #721c24; }
@@ -82,6 +82,20 @@ a { color: inherit; text-decoration: none; }
   font-size: 20px;
   color: var(--on-surface-muted);
   cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  background: none;
+  border: none;
+  padding: 0;
+  text-decoration: none;
+}
+.w-header__icon:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
 }
 
 /* ==============================
@@ -310,14 +324,20 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   min-width: 60px;
+  min-height: 60px;
   padding: 8px;
   color: var(--on-surface-muted);
   font-size: 11px;
   font-weight: 500;
   border-radius: var(--radius);
   transition: color 0.15s;
+}
+.w-nav-item:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: -2px;
 }
 .w-nav-item--active { color: var(--primary); }
 .w-nav-item__icon { font-size: 22px; line-height: 1; }
