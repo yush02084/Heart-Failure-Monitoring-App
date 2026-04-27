@@ -15,10 +15,15 @@ def home():
         return redirect(url_for("watcher.dashboard"))
 
     today = today_jst()
+
     today_record = DailyRecord.query.filter_by(
         parent_user_id=current_user.id,
         record_date=today,
     ).filter(DailyRecord.deleted_at.is_(None)).first()
+
+    # 今日未入力なら入力画面へ直接飛ばす
+    if today_record is None:
+        return redirect(url_for("parent.input"))
 
     recent_records = (
         DailyRecord.query
