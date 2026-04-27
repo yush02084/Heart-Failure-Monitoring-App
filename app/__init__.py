@@ -59,8 +59,10 @@ def create_app(config_class=Config):
 
 
 def _seed_if_empty():
-    """DBが空のときだけデモデータを投入する（テーブル未作成時はスキップ）"""
+    """テーブルがなければ作成し、DBが空のときだけデモデータを投入する"""
     from sqlalchemy.exc import OperationalError
+    # テーブルが存在しない場合は自動作成（flask db upgrade の代わり）
+    db.create_all()
     try:
         from app.models.user import User
         if User.query.first():
@@ -68,5 +70,4 @@ def _seed_if_empty():
         from scripts.seed_demo import seed
         seed()
     except OperationalError:
-        # テーブルがまだない（flask db upgrade 前）はスキップ
         pass
