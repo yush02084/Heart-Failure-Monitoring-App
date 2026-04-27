@@ -31,7 +31,6 @@ class DailyRecord(db.Model):
             weight_diff = round(diff, 1)
             weight_diff_str = f"+{weight_diff}" if diff >= 0 else str(weight_diff)
 
-        from app.core.tz import JST
         record_dt = self.record_date
         date_str = f"{record_dt.year}年{record_dt.month:02d}月{record_dt.day:02d}日"
 

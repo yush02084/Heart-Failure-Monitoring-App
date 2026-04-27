@@ -37,9 +37,13 @@ def create_app(config_class=Config):
     @app.route("/")
     def index():
         if current_user.is_authenticated:
-            if current_user.role == "watcher":
-                return redirect(url_for("watcher.dashboard"))
+            return _redirect_by_role(current_user)
         return redirect(url_for("auth.login"))
+
+    def _redirect_by_role(user):
+        if user.role == "parent":
+            return redirect(url_for("parent.home"))
+        return redirect(url_for("watcher.dashboard"))
 
     # DB初期化（マイグレーション実行後にシード）
     with app.app_context():

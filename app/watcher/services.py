@@ -1,4 +1,3 @@
-from datetime import timedelta
 from sqlalchemy.orm import joinedload
 from app.extensions import db
 from app.models import User, WatchRelationship, DailyRecord

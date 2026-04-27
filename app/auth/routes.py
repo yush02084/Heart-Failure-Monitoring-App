@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, session
+from flask import render_template, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from app.auth import bp
 from app.auth.forms import LoginForm, RegisterWatcherForm
@@ -20,10 +20,13 @@ def login():
 
         # ユーザー不在でもbcryptを走らせてタイミング攻撃を防ぐ
         if user is None:
-            bcrypt.check_password_hash(
-                "$2b$12$invalidhashpadding000000000000000000000000000000000000",
-                form.pin.data,
-            )
+            try:
+                bcrypt.check_password_hash(
+                    "$2b$12$invalidhashXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                    form.pin.data,
+                )
+            except Exception:
+                pass
             flash("ログインIDまたはPIN/パスワードが間違っています。", "error")
             return render_template("auth/login.html", form=form)
 
@@ -41,11 +44,14 @@ def login():
             return _redirect_by_role(user)
         else:
             from datetime import timedelta
+            from flask import current_app
             user.failed_attempts = (user.failed_attempts or 0) + 1
-            if user.failed_attempts >= 10:
+            max_attempts = current_app.config.get("LOGIN_MAX_ATTEMPTS", 5)
+            lock_minutes = current_app.config.get("LOGIN_LOCK_MINUTES", 15)
+            if user.failed_attempts >= max_attempts * 2:
                 user.locked_until = now_jst() + timedelta(hours=1)
-            elif user.failed_attempts >= 5:
-                user.locked_until = now_jst() + timedelta(minutes=15)
+            elif user.failed_attempts >= max_attempts:
+                user.locked_until = now_jst() + timedelta(minutes=lock_minutes)
             db.session.commit()
             flash("ログインIDまたはPIN/パスワードが間違っています。", "error")
 
