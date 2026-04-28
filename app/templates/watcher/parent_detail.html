@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}{{ parent.name }} — 心不全見守り{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/watcher.css') }}">
+{% endblock %}
+
+{% block content %}
+<header class="w-header">
+  <div class="w-header__logo">🫀 心不全見守り</div>
+  <div class="w-header__actions">
+    <span class="w-header__icon">🔔</span>
+    <a href="{{ url_for('watcher.dashboard') }}" class="w-header__icon" title="一覧に戻る">← 一覧</a>
+  </div>
+</header>
+
+<main class="w-container">
+
+  {% if today_alert.level >= 2 %}
+  <div class="w-alert-banner w-alert-banner--{% if today_alert.level == 3 %}danger{% else %}warning{% endif %}">
+    <span class="w-alert-banner__icon">⚠️</span>
+    <div>
+      <div class="w-alert-banner__title">
+        {% if today_alert.level == 3 %}急激な変化を検知{% else %}体重増加を検知{% endif %}
+      </div>
+      <div class="w-alert-banner__body">
+        {% if today_alert.level == 3 %}
+          体重が急激に増加しています。心不全の兆候である可能性があります。
+        {% else %}
+          体重がやや増加しています。様子を確認してください。
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="w-detail-profile">
+    <div class="w-avatar w-avatar--lg">👴</div>
+    <div class="w-detail-profile__info">
+      <div class="w-detail-profile__name">{{ parent.name }} 様</div>
+      {% if parent.phone_number %}
+      <div class="w-detail-profile__sub">📞 {{ parent.phone_number }}</div>
+      {% endif %}
+    </div>
+    {% if today_alert.should_show_call_button %}
+    <a href="{{ parent.tel_link }}" class="w-btn-call w-btn-call--danger w-btn-call--compact">
+      📞 電話する
+    </a>
+    {% endif %}
+  </div>
+
+  {% if recent_records %}
+  {% set today = recent_records[0] %}
+  <div class="w-stats-grid">
+    <div class="w-stats-chip">
+      <div class="w-stats-chip__label">最新体重</div>
+      <div class="w-stats-chip__value">{{ "%.1f"|format(today.weight) }}<span class="w-stats-chip__unit"> kg</span></div>
+    </div>
+    <div class="w-stats-chip {% if today.weight_diff and today.weight_diff > 0 and today.alert_level == 3 %}w-stats-chip--danger{% elif today.weight_diff and today.weight_diff > 0 and today.alert_level == 2 %}w-stats-chip--warning{% endif %}">
+      <div class="w-stats-chip__label">前日比</div>
+      <div class="w-stats-chip__value">
+        {{ today.weight_diff_str }}<span class="w-stats-chip__unit"> kg</span>
+      </div>
+    </div>
+    <div class="w-stats-chip {% if today.breath_condition >= 3 %}w-stats-chip--danger{% elif today.breath_condition == 2 %}w-stats-chip--warning{% endif %}">
+      <div class="w-stats-chip__label">息切れ</div>
+      <div class="w-stats-chip__value" style="font-size:15px; font-family:'Noto Sans JP',sans-serif;">{{ today.breath_label }}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <section class="w-table-section">
+    <h2 class="w-table-title">測定履歴</h2>
+    <table class="w-table">
+      <thead>
+        <tr>
+          <th>日付</th>
+          <th>体重</th>
+          <th>息切れ</th>
+          <th>状態</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in recent_records %}
+        <tr>
+          <td>{{ r.date_str }}</td>
+          <td style="font-family:'Inter',sans-serif; font-weight:600;">{{ "%.1f"|format(r.weight) }} kg</td>
+          <td class="{% if r.breath_condition >= 3 %}text-danger{% elif r.breath_condition == 2 %}text-warning{% endif %}">{{ r.breath_label }}</td>
+          <td><span class="w-table__status {{ r.alert_color_class }}">{{ r.alert_emoji }} {{ r.alert_label }}</span></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" style="text-align:center; color: var(--outline); padding: 24px;">記録なし</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+<nav class="w-bottom-nav">
+  <a href="{{ url_for('watcher.dashboard') }}" class="w-nav-item">
+    <span class="w-nav-item__icon">⊞</span>ダッシュボード
+  </a>
+  <a href="#" class="w-nav-item w-nav-item--active"><span class="w-nav-item__icon">📊</span>生体データ</a>
+  <a href="#" class="w-nav-item"><span class="w-nav-item__icon">🔔</span>通知</a>
+  <a href="#" class="w-nav-item"><span class="w-nav-item__icon">⚙️</span>設定</a>
+</nav>
+{% endblock %}

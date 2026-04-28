@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}ホーム — 心不全見守り{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/parent.css') }}">
+{% endblock %}
+
+{% block content %}
+<header class="p-header">
+  <div class="p-header__logo">🫀 心不全見守り</div>
+  <div class="p-header__name">{{ user.name }} さん</div>
+</header>
+
+<main class="p-container">
+
+  <h1 class="p-page-title">今日の記録</h1>
+
+  {% if today_record %}
+  <!-- 記録済み -->
+  <div class="p-today-card p-today-card--done">
+    <div class="p-today-card__body">
+      <div class="p-today-main">記録済み</div>
+    </div>
+    <a href="{{ url_for('parent.input') }}" class="p-btn p-btn--outline p-btn--sm">
+      修正する
+    </a>
+  </div>
+
+  {% else %}
+  <!-- 未入力 -->
+  <div class="p-today-card p-today-card--pending">
+    <div class="p-today-card__body">
+      <div class="p-today-main">まだです</div>
+    </div>
+  </div>
+
+  <a href="{{ url_for('parent.input') }}" class="p-btn p-btn--primary p-btn--lg">
+    入力する
+  </a>
+  {% endif %}
+
+  {% if recent_records %}
+  <section class="p-section">
+    <h2 class="p-section-title">過去7日の記録</h2>
+
+    <table class="p-table">
+      <thead>
+        <tr>
+          <th>日付</th>
+          <th>体重</th>
+          <th>息切れ</th>
+          <th>状態</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in recent_records %}
+        <tr>
+          <td>{{ r.date_str }}</td>
+          <td><strong>{{ "%.1f"|format(r.weight) }} kg</strong></td>
+          <td>{{ r.breath_label }}</td>
+          <td>
+            <span class="p-status {{ r.alert_color_class }}">
+              {{ r.alert_emoji }} {{ r.alert_label }}
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  {% endif %}
+
+</main>
+
+<nav class="p-bottom-nav">
+  <a href="{{ url_for('parent.home') }}" class="p-nav-item p-nav-item--active">
+    <span class="p-nav-item__icon">🏠</span>ホーム
+  </a>
+  <a href="{{ url_for('parent.input') }}" class="p-nav-item">
+    <span class="p-nav-item__icon">📝</span>記録する
+  </a>
+  <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="p-nav-item p-nav-item--btn">
+      <span class="p-nav-item__icon">🚪</span>ログアウト
+    </button>
+  </form>
+</nav>
+
+{% endblock %}

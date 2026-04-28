@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}招待リンクエラー — 心不全見守り{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/watcher.css') }}">
+{% endblock %}
+{% block content %}
+<header class="w-header">
+  <div class="w-header__logo">🫀 心不全見守り</div>
+</header>
+<main class="w-container" style="padding-top:48px; text-align:center;">
+  <div style="font-size:48px; margin-bottom:16px;">⚠️</div>
+  <h1 style="font-size:20px; font-weight:700; margin-bottom:12px;">招待リンクが無効です</h1>
+  <p style="color:var(--on-surface-muted); font-size:15px;">
+    このリンクは期限切れか、すでに使用済みです。<br>
+    親に新しい招待リンクを発行してもらってください。
+  </p>
+  <a href="{{ url_for('auth.login') }}"
+     style="display:inline-block; margin-top:32px; padding:12px 24px;
+            background:var(--primary); color:#fff; border-radius:8px; font-weight:700;">
+    ログインページへ
+  </a>
+</main>
+{% endblock %}

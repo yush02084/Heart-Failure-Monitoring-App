@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}ダッシュボード — 心不全見守り{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/watcher.css') }}">
+{% endblock %}
+
+{% block content %}
+<header class="w-header">
+  <div class="w-header__logo">🫀 心不全見守り</div>
+  <div class="w-header__actions">
+    <span class="w-header__icon" title="通知">🔔</span>
+    <span class="w-header__icon" title="アカウント">👤</span>
+  </div>
+</header>
+
+<main class="w-container">
+  <h1 class="w-page-title">見守り対象</h1>
+  <p class="w-page-subtitle">最新の健康状態を監視しています。</p>
+
+  <div class="w-cards-grid">
+    {% for p in watched_parents %}
+    <div class="w-parent-card">
+
+      <div class="w-parent-card__header">
+        <div class="w-avatar">👴</div>
+        <div>
+          <div class="w-parent-card__name">{{ p.parent_name }}</div>
+          <div class="w-parent-card__meta">見守り中</div>
+        </div>
+      </div>
+
+      <div class="w-badge w-badge--alert-{{ p.alert_level }}">{{ p.alert_emoji }} {{ p.alert_label }}</div>
+
+      <div class="w-stat-row">
+        {% if p.latest_record %}
+        <div class="w-stat-item">
+          <span class="w-stat-item__icon">⚖️</span>
+          <div class="w-stat-item__body">
+            <div class="w-stat-item__label">体重変化（過去3日）</div>
+            <div class="w-stat-item__value {% if p.latest_record.weight_diff and p.latest_record.weight_diff > 0 %}text-danger{% endif %}">
+              {{ p.latest_record.weight_diff_str }} kg
+            </div>
+          </div>
+        </div>
+        <div class="w-stat-item">
+          <span class="w-stat-item__icon">🌬️</span>
+          <div class="w-stat-item__body">
+            <div class="w-stat-item__label">息切れの状態</div>
+            <div class="w-stat-item__value w-stat-item__value--text {% if p.latest_record.breath_condition >= 3 %}text-danger{% elif p.latest_record.breath_condition == 2 %}text-warning{% endif %}">
+              {{ p.latest_record.breath_label }}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        <div class="w-stat-item">
+          <span class="w-stat-item__icon">🕐</span>
+          <div class="w-stat-item__body">
+            <div class="w-stat-item__label">最終記録日</div>
+            <div class="w-stat-item__value w-stat-item__value--text">{{ p.last_input_date_str }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-card-actions">
+        <a href="{{ url_for('watcher.parent_detail', parent_id=p.parent_id) }}" class="w-btn-call w-btn-call--outline w-btn-call--sm">
+          📋 詳細を見る
+        </a>
+        {% if p.alert_level >= 2 %}
+        <a href="{{ p.tel_link }}" class="w-btn-call w-btn-call--danger w-btn-call--sm">
+          📞 電話する
+        </a>
+        {% endif %}
+      </div>
+
+    </div>
+    {% else %}
+    <p style="color: var(--on-surface-muted); text-align: center; padding: 32px 0; grid-column: span 2;">見守り対象はまだいません。</p>
+    {% endfor %}
+  </div>
+
+  <div class="w-add-card">
+    <div class="w-add-card__icon">👥</div>
+    <div class="w-add-card__label">その他の家族を追加</div>
+    <div class="w-add-card__sub">見守り対象者を追加します</div>
+  </div>
+</main>
+
+<nav class="w-bottom-nav">
+  <a href="{{ url_for('watcher.dashboard') }}" class="w-nav-item w-nav-item--active">
+    <span class="w-nav-item__icon">⊞</span>ダッシュボード
+  </a>
+  <a href="#" class="w-nav-item"><span class="w-nav-item__icon">📊</span>生体データ</a>
+  <a href="#" class="w-nav-item"><span class="w-nav-item__icon">🔔</span>通知</a>
+  <a href="#" class="w-nav-item"><span class="w-nav-item__icon">⚙️</span>設定</a>
+</nav>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}見守り登録 — 心不全見守り{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/watcher.css') }}">
+<style>
+  .reg-page { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 40px 24px 60px; background: var(--bg); }
+  .reg-card { width: 100%; max-width: 480px; background: var(--surface); border: 1px solid var(--outline-variant); border-radius: var(--radius-lg); padding: 32px 28px; box-shadow: 0 4px 20px rgba(0, 98, 105, 0.08); }
+  .reg-logo { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 28px; }
+  .reg-invite-banner { background: var(--surface-low); border: 1px solid var(--outline-variant); border-left: 4px solid var(--primary); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 28px; font-size: 14px; color: var(--on-surface-muted); line-height: 1.6; }
+  .reg-invite-banner strong { color: var(--on-surface); font-size: 16px; }
+  .reg-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; color: var(--on-surface); }
+  .reg-subtitle { font-size: 14px; color: var(--on-surface-muted); margin-bottom: 28px; }
+  .reg-field { margin-bottom: 20px; }
+  .reg-field label { display: block; font-size: 14px; font-weight: 600; color: var(--on-surface); margin-bottom: 6px; }
+  .reg-field label .required { color: var(--danger); margin-left: 2px; }
+  .reg-field label .optional { font-size: 12px; font-weight: 400; color: var(--on-surface-muted); margin-left: 4px; }
+  .reg-field input { width: 100%; min-height: 52px; padding: 0 14px; font-family: 'Noto Sans JP', sans-serif; font-size: 16px; color: var(--on-surface); background: var(--surface); border: 1.5px solid var(--outline-variant); border-radius: var(--radius); outline: none; transition: border-color 0.15s, box-shadow 0.15s; appearance: none; }
+  .reg-field input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 98, 105, 0.12); }
+  .reg-field input::placeholder { color: var(--outline); }
+  .reg-field__hint { font-size: 12px; color: var(--on-surface-muted); margin-top: 5px; }
+  .field-error { font-size: 12px; color: var(--danger); margin-top: 5px; }
+  .reg-divider { border: none; border-top: 1px solid var(--outline-variant); margin: 24px 0; }
+  .reg-section-label { font-size: 12px; font-weight: 600; color: var(--on-surface-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
+  .reg-submit { width: 100%; min-height: 56px; background: var(--primary); color: white; border: none; border-radius: var(--radius-xl); font-family: 'Noto Sans JP', sans-serif; font-size: 17px; font-weight: 700; cursor: pointer; margin-top: 8px; transition: opacity 0.15s, transform 0.1s; }
+  .reg-submit:hover  { opacity: 0.92; }
+  .reg-submit:active { opacity: 0.85; transform: scale(0.99); }
+  .reg-login-link { text-align: center; font-size: 14px; color: var(--on-surface-muted); margin-top: 20px; }
+  .reg-login-link a { color: var(--primary); font-weight: 600; }
+  @media (min-width: 768px) { .reg-page { padding-top: 60px; } .reg-card { padding: 40px 36px; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="reg-page">
+  <div class="reg-card">
+
+    <div class="reg-logo">🫀 心不全見守り</div>
+
+    <div class="reg-invite-banner">
+      <strong>{{ parent_name }}</strong> さんから<br>
+      見守りへの招待が届いています。<br>
+      アカウントを作成して見守りを開始しましょう。
+    </div>
+
+    <h1 class="reg-title">アカウント登録</h1>
+    <p class="reg-subtitle">見守り担当者として登録します</p>
+
+    <form method="POST" action="{{ url_for('auth.register_watcher', token=token) }}">
+      {{ form.hidden_tag() }}
+
+      <div class="reg-section-label">基本情報</div>
+
+      <div class="reg-field">
+        <label for="name">お名前 <span class="required">*</span></label>
+        {{ form.name(id="name", placeholder="例：山田一郎") }}
+        {% for error in form.name.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="reg-field">
+        <label for="email">メールアドレス <span class="required">*</span></label>
+        {{ form.email(id="email", placeholder="例：ichiro@example.com") }}
+        <div class="reg-field__hint">通知メールの送信先になります</div>
+        {% for error in form.email.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="reg-field">
+        <label for="phone_number">電話番号 <span class="optional">（任意）</span></label>
+        {{ form.phone_number(id="phone_number", placeholder="例：090-1234-5678") }}
+        {% for error in form.phone_number.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+      </div>
+
+      <hr class="reg-divider">
+
+      <div class="reg-section-label">ログイン情報</div>
+
+      <div class="reg-field">
+        <label for="login_id">ログインID <span class="required">*</span></label>
+        {{ form.login_id(id="login_id", placeholder="例：ichiro2024", autocomplete="username") }}
+        <div class="reg-field__hint">4〜20文字（半角英数字）</div>
+        {% for error in form.login_id.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="reg-field">
+        <label for="password">パスワード <span class="required">*</span></label>
+        {{ form.password(id="password", placeholder="8文字以上", autocomplete="new-password") }}
+        <div class="reg-field__hint">8文字以上で設定してください</div>
+        {% for error in form.password.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+      </div>
+
+      <div class="reg-field">
+        <label for="password_confirm">パスワード（確認） <span class="required">*</span></label>
+        {{ form.password_confirm(id="password_confirm", placeholder="もう一度入力", autocomplete="new-password") }}
+        {% for error in form.password_confirm.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+      </div>
+
+      <button type="submit" class="reg-submit">登録して見守りを開始する</button>
+    </form>
+
+    <p class="reg-login-link">
+      すでにアカウントをお持ちの方は
+      <a href="{{ url_for('auth.login') }}">ログイン</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}

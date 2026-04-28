@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}体重・息切れを記録 — 心不全見守り{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/parent.css') }}">
+{% endblock %}
+
+{% block content %}
+<header class="p-header">
+  <div class="p-header__logo">🫀 心不全見守り</div>
+  <a href="{{ url_for('parent.home') }}" class="p-header__back">← 戻る</a>
+</header>
+
+<main class="p-container">
+
+  <!-- タイトル -->
+  <h1 class="p-page-title">今日の記録</h1>
+
+  <!-- 日付（曜日つきにする想定） -->
+  <p class="p-date">{{ today_str }}</p>
+
+  <form method="POST" action="{{ url_for('parent.input') }}" class="p-input-form">
+    {{ form.hidden_tag() }}
+
+    <!-- 体重 -->
+    <div class="p-input-section">
+      <h2 class="p-input-section__title">⚖️ 体重</h2>
+
+      <div class="p-weight-display" id="weight-display">
+        <span class="p-weight-number">{{ form.weight.data or "- - -" }}</span>
+        <span class="p-weight-unit">kg</span>
+      </div>
+
+      <div class="p-numpad">
+        {% for digit in ['7','8','9','4','5','6','1','2','3','.','0','⌫'] %}
+        <button type="button" class="p-numpad__key {% if digit == '⌫' %}p-numpad__key--del{% endif %}"
+          onclick="numpadPress('{{ digit }}')">
+          {{ digit }}
+        </button>
+        {% endfor %}
+      </div>
+
+      {{ form.weight(id="weight-input", type="hidden") }}
+    </div>
+
+    <!-- 息切れ -->
+    <div class="p-input-section">
+      <h2 class="p-input-section__title">🌬️ 息切れの状態</h2>
+
+      <div class="p-breath-choices">
+
+        <label class="p-breath-choice">
+          <input type="radio" name="breath_condition" value="1">
+          <div>
+            <div>普通</div>
+            <div class="p-breath-sub">いつも通り</div>
+          </div>
+        </label>
+
+        <label class="p-breath-choice">
+          <input type="radio" name="breath_condition" value="2">
+          <div>
+            <div>ちょっと苦しい</div>
+            <div class="p-breath-sub">少し息切れがある</div>
+          </div>
+        </label>
+
+        <label class="p-breath-choice p-breath-choice--warn">
+          <input type="radio" name="breath_condition" value="3">
+          <div>
+            <div>けっこう苦しい</div>
+            <div class="p-breath-sub">動くと息切れがある</div>
+          </div>
+        </label>
+
+        <label class="p-breath-choice p-breath-choice--warn">
+          <input type="radio" name="breath_condition" value="4">
+          <div>
+            <div>とても苦しい</div>
+            <div class="p-breath-sub">安静でも息切れがある</div>
+          </div>
+        </label>
+
+      </div>
+    </div>
+
+    <button type="submit" class="p-btn p-btn--primary p-btn--lg">
+      記録する
+    </button>
+
+  </form>
+</main>
+
+<script>
+  let weightVal = "{{ form.weight.data or '' }}";
+  updateDisplay();
+
+  function numpadPress(key) {
+    if (key === '⌫') {
+      weightVal = weightVal.slice(0, -1);
+    } else if (key === '.') {
+      if (!weightVal.includes('.')) weightVal += '.';
+    } else {
+      if (weightVal.length >= 6) return;
+      weightVal += key;
+    }
+    updateDisplay();
+  }
+
+  function updateDisplay() {
+    const display = document.getElementById('weight-display');
+    const input = document.getElementById('weight-input');
+    display.textContent = (weightVal || '- - -') + ' kg';
+    input.value = weightVal;
+  }
+</script>
+
+{% endblock %}
