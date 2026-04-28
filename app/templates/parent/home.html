@@ -12,36 +12,37 @@
 </header>
 
 <main class="p-container">
+
   <h1 class="p-page-title">今日の記録</h1>
 
   {% if today_record %}
+  <!-- 記録済み -->
   <div class="p-today-card p-today-card--done">
-    <div class="p-today-card__icon">✅</div>
     <div class="p-today-card__body">
-      <div class="p-today-card__label">今日の入力が完了しています</div>
-      <div class="p-today-card__stats">
-        体重 <strong>{{ "%.1f"|format(today_record.weight) }} kg</strong> ／
-        息切れ <strong>{{ today_record.breath_label }}</strong>
-      </div>
+      <div class="p-today-main">記録済み</div>
     </div>
-    <a href="{{ url_for('parent.input') }}" class="p-btn p-btn--outline p-btn--sm">修正</a>
+    <a href="{{ url_for('parent.input') }}" class="p-btn p-btn--outline p-btn--sm">
+      修正する
+    </a>
   </div>
+
   {% else %}
+  <!-- 未入力 -->
   <div class="p-today-card p-today-card--pending">
-    <div class="p-today-card__icon">📋</div>
     <div class="p-today-card__body">
-      <div class="p-today-card__label">今日の記録がまだです</div>
-      <div class="p-today-card__sub">毎日の記録が大切です</div>
+      <div class="p-today-main">まだです</div>
     </div>
   </div>
+
   <a href="{{ url_for('parent.input') }}" class="p-btn p-btn--primary p-btn--lg">
-    📝 今日の体重・息切れを入力する
+    入力する
   </a>
   {% endif %}
 
   {% if recent_records %}
   <section class="p-section">
     <h2 class="p-section-title">過去7日の記録</h2>
+
     <table class="p-table">
       <thead>
         <tr>
@@ -55,9 +56,13 @@
         {% for r in recent_records %}
         <tr>
           <td>{{ r.date_str }}</td>
-          <td style="font-family:'Inter',sans-serif; font-weight:600;">{{ "%.1f"|format(r.weight) }} kg</td>
+          <td><strong>{{ "%.1f"|format(r.weight) }} kg</strong></td>
           <td>{{ r.breath_label }}</td>
-          <td><span class="p-status {{ r.alert_color_class }}">{{ r.alert_emoji }} {{ r.alert_label }}</span></td>
+          <td>
+            <span class="p-status {{ r.alert_color_class }}">
+              {{ r.alert_emoji }} {{ r.alert_label }}
+            </span>
+          </td>
         </tr>
         {% endfor %}
       </tbody>
@@ -81,4 +86,5 @@
     </button>
   </form>
 </nav>
+
 {% endblock %}

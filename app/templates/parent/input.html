@@ -14,7 +14,7 @@
 <main class="p-container">
 
   <h1 class="p-page-title">今日の記録</h1>
-  <p class="p-page-subtitle">{{ today_str }}</p>
+  <p class="p-date">{{ today_str }}</p>
 
   {% if existing %}
   <div class="p-notice p-notice--info">今日の記録を修正します</div>
@@ -25,12 +25,13 @@
   <form method="POST" action="{{ url_for('parent.input') }}" class="p-input-form">
     {{ form.hidden_tag() }}
 
-    <!-- 体重入力 -->
+    <!-- 体重 -->
     <div class="p-input-section">
       <h2 class="p-input-section__title">⚖️ 体重</h2>
 
       <div class="p-weight-display" id="weight-display">
-        {{ form.weight.data or "- - -" }} kg
+        <span class="p-weight-number" id="weight-number">{{ form.weight.data or "- - -" }}</span>
+        <span class="p-weight-unit">kg</span>
       </div>
       <div class="p-weight-hint">例: 65.3 kg ／ 小数点以下1桁まで</div>
 
@@ -45,21 +46,30 @@
         </button>
         {% endfor %}
       </div>
+
       {{ form.weight(id="weight-input", type="hidden") }}
       {% for error in form.weight.errors %}
         <div class="p-field-error">{{ error }}</div>
       {% endfor %}
     </div>
 
-    <!-- 息切れ選択 -->
+    <!-- 息切れ -->
     <div class="p-input-section">
       <h2 class="p-input-section__title">🌬️ 息切れの状態</h2>
+
       <div class="p-breath-choices">
         {% for value, label in form.breath_condition.choices %}
-        <label class="p-breath-choice {% if loop.index == 3 or loop.index == 4 %}p-breath-choice--warn{% endif %}">
+        <label class="p-breath-choice {% if loop.index >= 3 %}p-breath-choice--warn{% endif %}">
           <input type="radio" name="breath_condition" value="{{ value }}"
                  {% if form.breath_condition.data == value %}checked{% endif %}>
-          <span class="p-breath-choice__label">{{ label }}</span>
+          <div>
+            <div>{{ label }}</div>
+            {% if value == '1' %}<div class="p-breath-sub">いつも通り</div>
+            {% elif value == '2' %}<div class="p-breath-sub">少し息切れがある</div>
+            {% elif value == '3' %}<div class="p-breath-sub">動くと息切れがある</div>
+            {% elif value == '4' %}<div class="p-breath-sub">安静でも息切れがある</div>
+            {% endif %}
+          </div>
         </label>
         {% endfor %}
       </div>
@@ -69,7 +79,7 @@
     </div>
 
     <button type="submit" class="p-btn p-btn--primary p-btn--lg">
-      記録を保存する ✓
+      記録する
     </button>
 
   </form>
@@ -77,10 +87,10 @@
 
 <script>
   let weightVal = "{{ form.weight.data or '' }}";
-  let displayEl, inputEl;
+  let numberEl, inputEl;
 
   document.addEventListener('DOMContentLoaded', function () {
-    displayEl = document.getElementById('weight-display');
+    numberEl = document.getElementById('weight-number');
     inputEl = document.getElementById('weight-input');
     updateDisplay();
   });
@@ -107,9 +117,10 @@
   }
 
   function updateDisplay() {
-    if (!displayEl) return;
-    displayEl.textContent = (weightVal || '- - -') + ' kg';
+    if (!numberEl) return;
+    numberEl.textContent = weightVal || '- - -';
     inputEl.value = weightVal;
   }
 </script>
+
 {% endblock %}
