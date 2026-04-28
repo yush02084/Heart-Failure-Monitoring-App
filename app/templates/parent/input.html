@@ -13,58 +13,79 @@
 
 <main class="p-container">
 
+  <!-- タイトル -->
   <h1 class="p-page-title">今日の記録</h1>
-  <p class="p-page-subtitle">{{ today_str }}</p>
 
-  {% if existing %}
-  <div class="p-notice p-notice--info">今日の記録を修正します</div>
-  {% endif %}
+  <!-- 日付（曜日つきにする想定） -->
+  <p class="p-date">{{ today_str }}</p>
 
   <form method="POST" action="{{ url_for('parent.input') }}" class="p-input-form">
     {{ form.hidden_tag() }}
 
-    <!-- 体重入力 -->
+    <!-- 体重 -->
     <div class="p-input-section">
       <h2 class="p-input-section__title">⚖️ 体重</h2>
 
       <div class="p-weight-display" id="weight-display">
-        {{ form.weight.data or "- - -" }} kg
+        <span class="p-weight-number">{{ form.weight.data or "- - -" }}</span>
+        <span class="p-weight-unit">kg</span>
       </div>
 
-      <!-- テンキー -->
       <div class="p-numpad">
         {% for digit in ['7','8','9','4','5','6','1','2','3','.','0','⌫'] %}
         <button type="button" class="p-numpad__key {% if digit == '⌫' %}p-numpad__key--del{% endif %}"
-                onclick="numpadPress('{{ digit }}')">
+          onclick="numpadPress('{{ digit }}')">
           {{ digit }}
         </button>
         {% endfor %}
       </div>
+
       {{ form.weight(id="weight-input", type="hidden") }}
-      {% for error in form.weight.errors %}
-        <div class="p-field-error">{{ error }}</div>
-      {% endfor %}
     </div>
 
-    <!-- 息切れ選択 -->
+    <!-- 息切れ -->
     <div class="p-input-section">
       <h2 class="p-input-section__title">🌬️ 息切れの状態</h2>
+
       <div class="p-breath-choices">
-        {% for value, label in form.breath_condition.choices %}
-        <label class="p-breath-choice {% if loop.index == 3 or loop.index == 4 %}p-breath-choice--warn{% endif %}">
-          <input type="radio" name="breath_condition" value="{{ value }}"
-                 {% if form.breath_condition.data == value %}checked{% endif %}>
-          <span class="p-breath-choice__label">{{ label }}</span>
+
+        <label class="p-breath-choice">
+          <input type="radio" name="breath_condition" value="1">
+          <div>
+            <div>普通</div>
+            <div class="p-breath-sub">いつも通り</div>
+          </div>
         </label>
-        {% endfor %}
+
+        <label class="p-breath-choice">
+          <input type="radio" name="breath_condition" value="2">
+          <div>
+            <div>ちょっと苦しい</div>
+            <div class="p-breath-sub">少し息切れがある</div>
+          </div>
+        </label>
+
+        <label class="p-breath-choice p-breath-choice--warn">
+          <input type="radio" name="breath_condition" value="3">
+          <div>
+            <div>けっこう苦しい</div>
+            <div class="p-breath-sub">動くと息切れがある</div>
+          </div>
+        </label>
+
+        <label class="p-breath-choice p-breath-choice--warn">
+          <input type="radio" name="breath_condition" value="4">
+          <div>
+            <div>とても苦しい</div>
+            <div class="p-breath-sub">安静でも息切れがある</div>
+          </div>
+        </label>
+
       </div>
-      {% for error in form.breath_condition.errors %}
-        <div class="p-field-error">{{ error }}</div>
-      {% endfor %}
     </div>
 
     <button type="submit" class="p-btn p-btn--primary p-btn--lg">
-      記録を保存する ✓
+      記録する
     </button>
 
   </form>
@@ -93,4 +114,5 @@
     input.value = weightVal;
   }
 </script>
+
 {% endblock %}
