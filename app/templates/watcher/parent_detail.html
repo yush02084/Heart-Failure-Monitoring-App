@@ -102,13 +102,14 @@
   <a href="{{ url_for('watcher.dashboard') }}" class="w-nav-item">
     <span class="w-nav-item__icon">⊞</span>ダッシュボード
   </a>
-  <a href="#" class="w-nav-item w-nav-item--active"><span class="w-nav-item__icon">📊</span>生体データ</a>
-  <a href="#" class="w-nav-item"><span class="w-nav-item__icon">🔔</span>通知</a>
-  <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="submit" class="w-nav-item w-nav-item--btn">
-      <span class="w-nav-item__icon">🚪</span>ログアウト
-    </button>
-  </form>
+  <a href="{{ url_for('watcher.join') }}" class="w-nav-item">
+    <span class="w-nav-item__icon">➕</span>家族を追加
+  </a>
+  <a href="{{ url_for('watcher.notifications') }}" class="w-nav-item">
+    <span class="w-nav-item__icon">🔔</span>通知
+  </a>
+  <a href="{{ url_for('watcher.settings') }}" class="w-nav-item">
+    <span class="w-nav-item__icon">⚙️</span>設定
+  </a>
 </nav>
 {% endblock %}

@@ -290,6 +290,7 @@ a { color: inherit; text-decoration: none; }
   min-height: 48px;
   font-size: 15px;
   flex: 1;
+  white-space: nowrap;
 }
 
 /* ボタン横並び行 */
@@ -617,6 +618,7 @@ a { color: inherit; text-decoration: none; }
 
 /* w-add-card をリンクとして使う */
 a.w-add-card {
+  display: block;
   text-decoration: none;
   color: inherit;
 }
