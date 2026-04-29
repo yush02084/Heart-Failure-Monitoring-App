@@ -15,6 +15,7 @@ class User(UserMixin, db.Model):
     phone_number = db.Column(db.Text)
     base_weight = db.Column(db.Float)
     base_weight_updated_at = db.Column(db.DateTime)
+    notifications_viewed_at = db.Column(db.DateTime)
     failed_attempts = db.Column(db.Integer, default=0)
     locked_until = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, nullable=False, default=now_jst)

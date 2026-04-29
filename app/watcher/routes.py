@@ -138,6 +138,10 @@ def unwatch(parent_id):
 def notifications():
     if not current_user.is_watcher():
         abort(403)
+    # 通知を見たタイムスタンプを更新（バッジクリア）
+    current_user.notifications_viewed_at = now_jst()
+    db.session.commit()
+
     ctx = get_dashboard_context(current_user)
     notifs = [
         p for p in ctx["watched_parents"]

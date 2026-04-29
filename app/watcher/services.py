@@ -75,12 +75,23 @@ def get_dashboard_context(watcher: User) -> dict:
     # 警戒→注意→通常の順でソート
     watched_parents.sort(key=lambda x: x["alert_level"], reverse=True)
 
-    # 通知バッジ数（alert_level >= 2 または 2日以上未入力）
-    unread_count = sum(
-        1 for p in watched_parents
-        if p["alert_level"] >= 2 or (p["days_since_last_input"] is not None and p["days_since_last_input"] >= 2)
-        or p["days_since_last_input"] is None
-    )
+    # 通知バッジ数（通知を最後に見た時刻より後に更新されたアラートのみカウント）
+    viewed_at = watcher.notifications_viewed_at
+    unread_count = 0
+    for p in watched_parents:
+        has_alert = (
+            p["alert_level"] >= 2
+            or p["days_since_last_input"] is None
+            or (p["days_since_last_input"] is not None and p["days_since_last_input"] >= 2)
+        )
+        if not has_alert:
+            continue
+        if viewed_at is None:
+            unread_count += 1
+        else:
+            latest_rec = latest_map.get(p["parent_id"])
+            if latest_rec is None or latest_rec.updated_at > viewed_at:
+                unread_count += 1
 
     return {"user": _user_dict(watcher), "watched_parents": watched_parents, "unread_count": unread_count}
 
