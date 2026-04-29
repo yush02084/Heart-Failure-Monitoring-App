@@ -38,6 +38,12 @@
         {{ form.phone_number(class="reg-input", placeholder="例: 090-1234-5678") }}
         {% for e in form.phone_number.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
       </div>
+
+      <div class="reg-field">
+        <label>{{ form.email.label.text }}</label>
+        {{ form.email(class="reg-input", placeholder="例: taro@example.com", type="email") }}
+        {% for e in form.email.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+      </div>
     </div>
 
     <!-- パスワード変更 -->

@@ -89,6 +89,7 @@ def settings():
 
         current_user.name = form.name.data
         current_user.phone_number = form.phone_number.data or None
+        current_user.email = form.email.data or None
         current_user.updated_at = now_jst()
 
         if form.new_password.data:

@@ -53,6 +53,7 @@ class ParentSettingsForm(FlaskForm):
 class WatcherSettingsForm(FlaskForm):
     name                 = StringField("お名前", validators=[DataRequired(), Length(1, 20)])
     phone_number         = StringField("電話番号", validators=[Optional(), Length(max=20)])
+    email                = StringField("メールアドレス", validators=[Optional(), Length(max=120)])
     current_password     = PasswordField("現在のパスワード", validators=[DataRequired()])
     new_password         = PasswordField("新しいパスワード（変更する場合）",
                                validators=[Optional(), Length(8)])
