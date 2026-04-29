@@ -89,7 +89,6 @@ def register_watcher(token):
             pin_hash=pw_hash,
             role="watcher",
             name=form.name.data,
-            email=form.email.data,
             phone_number=form.phone_number.data or None,
         )
         db.session.add(watcher)
