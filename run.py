@@ -9,7 +9,7 @@ if __name__ == "__main__":
         try:
             upgrade()  # 起動時に自動でDBマイグレーションを適用
         except OperationalError:
-            # DBは存在するがマイグレーション履歴がない場合はstampして再実行
-            stamp()
+            # DBは存在するがマイグレーション履歴がない場合、初期スキーマにstampして差分だけ適用
+            stamp("e5ae00de9bdc")
             upgrade()
     app.run(debug=True, host="0.0.0.0", port=5000)
