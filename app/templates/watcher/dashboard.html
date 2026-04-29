@@ -82,13 +82,13 @@
     {% else %}
     <p class="w-empty-state">見守り対象はまだいません。</p>
     {% endfor %}
-  </div>
 
-  <a href="{{ url_for('watcher.join') }}" class="w-add-card" aria-label="その他の家族を追加">
-    <div class="w-add-card__icon">👥</div>
-    <div class="w-add-card__label">その他の家族を追加</div>
-    <div class="w-add-card__sub">招待リンクで見守り対象者を追加します</div>
-  </a>
+    <a href="{{ url_for('watcher.join') }}" class="w-add-card" aria-label="その他の家族を追加">
+      <div class="w-add-card__icon">👥</div>
+      <div class="w-add-card__label">その他の家族を追加</div>
+      <div class="w-add-card__sub">招待リンクで見守り対象者を追加します</div>
+    </a>
+  </div>
 </main>
 
 <nav class="w-bottom-nav">
