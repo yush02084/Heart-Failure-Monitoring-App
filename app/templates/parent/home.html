@@ -13,30 +13,30 @@
 
 <main class="p-container">
 
-  <h1 class="p-page-title">今日の記録</h1>
+  <!-- 会話メッセージ -->
+  <div class="p-greeting-box">
+    <div class="p-greeting-text">
+      こんにちは、{{ user.name }}さん。<br>
+      今日の体調はいかがですか？<br>
+      それでは今日の体調を記録をしましょう。
+    </div>
+  </div>
 
+  <!-- 入力ボタン（最重要） -->
+  <a href="{{ url_for('parent.input') }}" class="p-btn p-btn--primary p-btn--lg">
+    記録する
+  </a>
+
+  <!-- 記録済みの場合だけ表示 -->
   {% if today_record %}
-  <!-- 記録済み -->
   <div class="p-today-card p-today-card--done">
     <div class="p-today-card__body">
-      <div class="p-today-main">記録済み</div>
+      <div class="p-today-main">本日は記録済みです</div>
     </div>
     <a href="{{ url_for('parent.input') }}" class="p-btn p-btn--outline p-btn--sm">
       修正する
     </a>
   </div>
-
-  {% else %}
-  <!-- 未入力 -->
-  <div class="p-today-card p-today-card--pending">
-    <div class="p-today-card__body">
-      <div class="p-today-main">まだです</div>
-    </div>
-  </div>
-
-  <a href="{{ url_for('parent.input') }}" class="p-btn p-btn--primary p-btn--lg">
-    入力する
-  </a>
   {% endif %}
 
   {% if recent_records %}
