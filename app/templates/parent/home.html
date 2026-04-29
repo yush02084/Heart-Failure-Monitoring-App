@@ -9,10 +9,13 @@
 <header class="p-header">
   <div class="p-header__logo">🫀 心不全見守り</div>
   <div class="p-header__name">{{ user.name }} さん</div>
-  <form method="POST" action="{{ url_for('auth.logout') }}" class="p-header__logout-form">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="submit" class="p-header__logout">ログアウト</button>
-  </form>
+  <div class="p-header__logout-form" style="display:flex;gap:8px;align-items:center;">
+    <a href="{{ url_for('parent.settings') }}" class="p-header__logout">⚙️ 設定</a>
+    <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="p-header__logout">ログアウト</button>
+    </form>
+  </div>
 </header>
 
 <main class="p-container">
