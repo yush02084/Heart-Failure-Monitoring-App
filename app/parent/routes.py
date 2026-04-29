@@ -100,6 +100,6 @@ def input():
     return render_template(
         "parent/input.html",
         form=form,
-        today_str=f"{today.year}年{today.month:02d}月{today.day:02d}日（今日）",
+        today_str=f"{today.year}年{today.month:02d}月{today.day:02d}日（{'月火水木金土日'[today.weekday()]}）",
         existing=existing is not None,
     )
