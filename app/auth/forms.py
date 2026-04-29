@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, HiddenField, DecimalField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, Optional, NumberRange
+from wtforms.validators import DataRequired, Length, EqualTo, Optional, NumberRange
 
 
 class LoginForm(FlaskForm):
@@ -16,7 +16,6 @@ class RegisterWatcherForm(FlaskForm):
         validators=[DataRequired(), EqualTo("password", message="パスワードが一致しません")]
     )
     name = StringField("お名前", validators=[DataRequired(), Length(1, 20)])
-    email = StringField("メールアドレス", validators=[DataRequired(), Email()])
     phone_number = StringField("電話番号", validators=[Optional(), Length(max=20)])
     token = HiddenField()
 
