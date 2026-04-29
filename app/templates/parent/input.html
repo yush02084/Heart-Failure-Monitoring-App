@@ -9,6 +9,10 @@
 <header class="p-header">
   <div class="p-header__logo">🫀 心不全見守り</div>
   <a href="{{ url_for('parent.home') }}" class="p-header__back">← 戻る</a>
+  <form method="POST" action="{{ url_for('auth.logout') }}" class="p-header__logout-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="p-header__logout">ログアウト</button>
+  </form>
 </header>
 
 <main class="p-container">
@@ -98,6 +102,21 @@
   {% include "parent/_invite_card.html" %}
 
 </main>
+
+<nav class="p-bottom-nav">
+  <a href="{{ url_for('parent.home') }}" class="p-nav-item">
+    <span class="p-nav-item__icon">🏠</span>ホーム
+  </a>
+  <a href="{{ url_for('parent.input') }}" class="p-nav-item p-nav-item--active">
+    <span class="p-nav-item__icon">📝</span>記録する
+  </a>
+  <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="p-nav-item p-nav-item--btn">
+      <span class="p-nav-item__icon">🚪</span>ログアウト
+    </button>
+  </form>
+</nav>
 
 <script>
   let weightVal = "{{ form.weight.data or '' }}";

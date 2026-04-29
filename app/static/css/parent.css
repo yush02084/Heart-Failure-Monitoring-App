@@ -470,10 +470,24 @@ body {
   font-family: 'Noto Sans JP', sans-serif;
 }
 
+.p-header__logout-form { display: none; }
+
 @media (min-width: 768px) {
   body { padding-bottom: 0; }
   .p-container { max-width: 720px; padding-top: 32px; }
   .p-bottom-nav { display: none; }
+  .p-header__logout-form { display: block; }
+  .p-header__logout {
+    background: transparent;
+    border: 1.5px solid var(--outline-variant);
+    border-radius: var(--radius);
+    padding: 6px 14px;
+    font-size: 14px;
+    color: var(--on-surface-muted);
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .p-header__logout:hover { background: var(--surface-low); }
 }
 
 /* 小画面（320px）対応 */
