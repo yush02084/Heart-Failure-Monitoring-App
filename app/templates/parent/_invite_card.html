@@ -1,0 +1,17 @@
+<section class="p-section">
+  <h2 class="p-section-title">見守り登録</h2>
+  <div class="p-invite-card">
+    <p class="p-invite-desc">家族に見守ってもらうための招待リンクを発行します。</p>
+    <button type="button" class="p-btn p-btn--outline" id="invite-btn" onclick="generateInvite()">
+      🔗 招待リンクを発行する
+    </button>
+    <div id="invite-result" class="p-invite-result" style="display:none;">
+      <p class="p-invite-label">招待リンク（30分有効）</p>
+      <div class="p-invite-url-row">
+        <input type="text" id="invite-url" class="p-invite-url" readonly>
+        <button type="button" class="p-btn p-btn--outline p-btn--sm" onclick="copyInvite()">コピー</button>
+      </div>
+      <p id="copy-msg" class="p-invite-copy-msg" style="display:none;">コピーしました！</p>
+    </div>
+  </div>
+</section>
