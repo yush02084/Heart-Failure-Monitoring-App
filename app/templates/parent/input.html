@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}体重・息切れを記録 — 心不全見守り{% endblock %}
+{% block title %}体重・息切れを記録 — MiMo{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/parent.css') }}">
@@ -7,7 +7,7 @@
 
 {% block content %}
 <header class="p-header">
-  <div class="p-header__logo">🫀 心不全見守り</div>
+  <div class="p-header__logo"><img src="/static/icons/icon-192.png" alt="MiMo" class="header-logo-img">MiMo</div>
   <a href="{{ url_for('parent.home') }}" class="p-header__back">← 戻る</a>
   <div class="p-header__logout-form" style="display:flex;gap:8px;align-items:center;">
     <a href="{{ url_for('parent.settings') }}" class="p-header__logout">⚙️ 設定</a>

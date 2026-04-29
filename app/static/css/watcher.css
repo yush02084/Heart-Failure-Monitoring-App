@@ -82,6 +82,11 @@ a { color: inherit; text-decoration: none; }
   font-weight: 700;
   color: var(--primary);
 }
+.header-logo-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
 .w-header__actions { display: flex; gap: 20px; }
 .w-header__icon {
   font-size: 20px;

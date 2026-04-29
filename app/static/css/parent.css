@@ -58,9 +58,17 @@ body {
 }
 
 .p-header__logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 20px;
   font-weight: 700;
   color: var(--primary);
+}
+.header-logo-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 
 .p-header__name {
