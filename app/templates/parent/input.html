@@ -9,12 +9,22 @@
 <header class="p-header">
   <div class="p-header__logo">🫀 心不全見守り</div>
   <a href="{{ url_for('parent.home') }}" class="p-header__back">← 戻る</a>
+  <form method="POST" action="{{ url_for('auth.logout') }}" class="p-header__logout-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="p-header__logout">ログアウト</button>
+  </form>
 </header>
 
 <main class="p-container">
 
   <h1 class="p-page-title">今日の記録</h1>
   <p class="p-date">{{ today_str }}</p>
+
+  {% if existing %}
+  <div class="p-notice p-notice--info">今日の記録を修正します</div>
+  {% else %}
+  <div class="p-notice p-notice--info">今日はまだ記録がありません。体重と息切れを入力してください。</div>
+  {% endif %}
 
   <form method="POST" action="{{ url_for('parent.input') }}" class="p-input-form">
     {{ form.hidden_tag() }}
@@ -24,14 +34,17 @@
       <h2 class="p-input-section__title">⚖️ 体重</h2>
 
       <div class="p-weight-display" id="weight-display">
-        <span class="p-weight-number">{{ form.weight.data or "- - -" }}</span>
+        <span class="p-weight-number" id="weight-number">{{ form.weight.data or "- - -" }}</span>
         <span class="p-weight-unit">kg</span>
       </div>
 
-      <!-- ⭐ここ変更 -->
-      <div class="p-numpad">
+      <!-- テンキー（Bさんレイアウト: 0と⌫を最終行に独立配置） -->
+      <div class="p-numpad" role="group" aria-label="体重入力テンキー">
         {% for digit in ['7','8','9','4','5','6','1','2','3'] %}
-        <button type="button" class="p-numpad__key" onclick="numpadPress('{{ digit }}')">
+        <button type="button"
+                class="p-numpad__key"
+                aria-label="数字 {{ digit }}"
+                onclick="numpadPress('{{ digit }}')">
           {{ digit }}
         </button>
         {% endfor %}
@@ -40,58 +53,44 @@
         <div></div>
 
         <!-- 0（中央） -->
-        <button type="button" class="p-numpad__key" onclick="numpadPress('0')">
+        <button type="button" class="p-numpad__key" aria-label="数字 0" onclick="numpadPress('0')">
           0
         </button>
 
         <!-- 削除（右） -->
-        <button type="button" class="p-numpad__key p-numpad__key--del" onclick="numpadPress('⌫')">
+        <button type="button" class="p-numpad__key p-numpad__key--del" aria-label="削除" onclick="numpadPress('⌫')">
           ⌫
         </button>
       </div>
 
       {{ form.weight(id="weight-input", type="hidden") }}
+      {% for error in form.weight.errors %}
+        <div class="p-field-error">{{ error }}</div>
+      {% endfor %}
     </div>
 
-    <!-- 息切れ -->
+    <!-- 息切れ（Bさんのalert色分け + checked状態保持） -->
     <div class="p-input-section">
       <h2 class="p-input-section__title">🌬️ 息切れの状態</h2>
 
       <div class="p-breath-choices">
-
-        <label class="p-breath-choice alert-1">
-          <input type="radio" name="breath_condition" value="1">
+        {% set alert_classes = ['', 'alert-1', 'alert-2', 'alert-3', 'alert-3'] %}
+        {% set breath_descs = ['', 'いつも通り', '少し息切れ', '動くと息切れ', '安静でも息切れ'] %}
+        {% for value, label in form.breath_condition.choices %}
+        {% set v = value|int %}
+        <label class="p-breath-choice {{ alert_classes[v] }}">
+          <input type="radio" name="breath_condition" value="{{ value }}"
+                 {% if form.breath_condition.data == value %}checked{% endif %}>
           <div class="p-breath-row">
-            <span class="p-breath-main">普通</span>
-            <span class="p-breath-desc">（いつも通り）</span>
+            <span class="p-breath-main">{{ label }}</span>
+            <span class="p-breath-desc">（{{ breath_descs[v] }}）</span>
           </div>
         </label>
-
-        <label class="p-breath-choice alert-2">
-          <input type="radio" name="breath_condition" value="2">
-          <div class="p-breath-row">
-            <span class="p-breath-main">ちょっと苦しい</span>
-            <span class="p-breath-desc">（少し息切れ）</span>
-          </div>
-        </label>
-
-        <label class="p-breath-choice alert-3">
-          <input type="radio" name="breath_condition" value="3">
-          <div class="p-breath-row">
-            <span class="p-breath-main">けっこう苦しい</span>
-            <span class="p-breath-desc">（動くと息切れ）</span>
-          </div>
-        </label>
-
-        <label class="p-breath-choice alert-3">
-          <input type="radio" name="breath_condition" value="4">
-          <div class="p-breath-row">
-            <span class="p-breath-main">とても苦しい</span>
-            <span class="p-breath-desc">（安静でも息切れ）</span>
-          </div>
-        </label>
-
+        {% endfor %}
       </div>
+      {% for error in form.breath_condition.errors %}
+        <div class="p-field-error">{{ error }}</div>
+      {% endfor %}
     </div>
 
     <button type="submit" class="p-btn p-btn--primary p-btn--lg">
@@ -99,37 +98,103 @@
     </button>
 
   </form>
+
+  {% include "parent/_invite_card.html" %}
+
 </main>
 
+<nav class="p-bottom-nav">
+  <a href="{{ url_for('parent.home') }}" class="p-nav-item">
+    <span class="p-nav-item__icon">🏠</span>ホーム
+  </a>
+  <a href="{{ url_for('parent.input') }}" class="p-nav-item p-nav-item--active">
+    <span class="p-nav-item__icon">📝</span>記録する
+  </a>
+  <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="p-nav-item p-nav-item--btn">
+      <span class="p-nav-item__icon">🚪</span>ログアウト
+    </button>
+  </form>
+</nav>
+
 <script>
-  let weightVal = "";
+  let weightVal = "{{ form.weight.data or '' }}";
+  let numberEl, inputEl;
+
+  document.addEventListener('DOMContentLoaded', function () {
+    numberEl = document.getElementById('weight-number');
+    inputEl = document.getElementById('weight-input');
+    updateDisplay();
+  });
 
   function numpadPress(key) {
     if (key === '⌫') {
-      weightVal = weightVal.slice(0, -1);
+      // 自動挿入された小数点で終わっている場合は数字ごと2文字削除
+      if (weightVal.endsWith('.')) {
+        weightVal = weightVal.slice(0, -2);
+      } else {
+        weightVal = weightVal.slice(0, -1);
+      }
     } else {
-      if (weightVal.length >= 4) return;
+      if (weightVal.length >= 5) return;
       weightVal += key;
+      // 整数部が2桁になったら自動で小数点を挿入
+      if (!weightVal.includes('.') && weightVal.length === 2) {
+        weightVal += '.';
+      }
     }
     updateDisplay();
   }
 
   function updateDisplay() {
-    const display = document.getElementById('weight-display');
-    const input = document.getElementById('weight-input');
-
-    if (weightVal.length === 0) {
-      display.textContent = "- - - kg";
-      input.value = "";
-      return;
-    }
-
-    let num = parseInt(weightVal);
-    let weight = (num / 10).toFixed(1);
-
-    display.textContent = weight + " kg";
-    input.value = weight;
+    if (!numberEl) return;
+    numberEl.textContent = weightVal || '- - -';
+    inputEl.value = weightVal;
   }
 </script>
+
+{% block extra_js %}
+<script>
+  const INVITE_URL = "{{ url_for('parent.invite') }}";
+  const CSRF_TOKEN = "{{ csrf_token() }}";
+
+  function generateInvite() {
+    const btn = document.getElementById('invite-btn');
+    btn.disabled = true;
+    btn.textContent = '発行中...';
+    fetch(INVITE_URL, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': CSRF_TOKEN, 'Content-Type': 'application/json' },
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.url) {
+        document.getElementById('invite-url').value = data.url;
+        document.getElementById('invite-result').style.display = 'block';
+      } else {
+        alert('招待リンクの発行に失敗しました。');
+      }
+      btn.disabled = false;
+      btn.textContent = '🔗 招待リンクを再発行する';
+    })
+    .catch(() => {
+      alert('通信エラーが発生しました。');
+      btn.disabled = false;
+      btn.textContent = '🔗 招待リンクを発行する';
+    });
+  }
+
+  function copyInvite() {
+    const url = document.getElementById('invite-url');
+    url.select();
+    navigator.clipboard.writeText(url.value).then(() => {
+      const msg = document.getElementById('copy-msg');
+      msg.style.display = 'block';
+      setTimeout(() => { msg.style.display = 'none'; }, 2000);
+    });
+  }
+</script>
+{% endblock %}
 
 {% endblock %}

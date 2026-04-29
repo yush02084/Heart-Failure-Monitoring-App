@@ -95,8 +95,55 @@ def seed():
         )
         db.session.add(record)
 
+    # ── 親ユーザー2（今日のデータ未入力） ──
+    parent2 = User(
+        login_id="parent02",
+        pin_hash=bcrypt.generate_password_hash("1234").decode("utf-8"),
+        role="parent",
+        name="鈴木一郎",
+        phone_number="+819011112222",
+        base_weight=72.0,
+        base_weight_updated_at=now,
+    )
+    db.session.add(parent2)
+    db.session.flush()
+
+    # parent02 も watcher01 が見守る
+    rel2 = WatchRelationship(
+        parent_user_id=parent2.id,
+        watcher_user_id=watcher.id,
+        status="active",
+        invited_at=now,
+        accepted_at=now,
+    )
+    db.session.add(rel2)
+
+    # parent02 の過去6日分（今日は未入力）
+    parent2_records = [
+        # (日前, 体重, 息切れ)
+        (1, 72.5, 1),  # 昨日: 通常
+        (2, 72.3, 1),  # 2日前: 通常
+        (3, 72.1, 1),  # 3日前: 通常
+        (4, 72.0, 1),  # 4日前: 通常
+        (5, 71.8, 1),  # 5日前: 通常
+        (6, 71.9, 1),  # 6日前: 通常
+    ]
+    for days_ago, weight, breath in parent2_records:
+        rec_date = today - timedelta(days=days_ago)
+        ref = parent2.base_weight
+        level = calc_alert_level(weight, breath, ref)
+        db.session.add(DailyRecord(
+            parent_user_id=parent2.id,
+            record_date=rec_date,
+            weight=weight,
+            breath_condition=breath,
+            alert_level=level,
+            alert_logic_version=ALERT_LOGIC_VERSION,
+        ))
+
     db.session.commit()
     print("[seed] デモデータを投入しました")
-    print("  親:  login_id=parent01   PIN=1234")
-    print("  子:  login_id=watcher01  password=password1")
+    print("  親01: login_id=parent01  PIN=1234  (今日: 警戒)")
+    print("  親02: login_id=parent02  PIN=1234  (今日: 未入力)")
+    print("  子:   login_id=watcher01 password=password1")
     print("  招待トークン: demo-token (30日有効)")

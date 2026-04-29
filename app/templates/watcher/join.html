@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}家族を追加 — 心不全見守り{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/watcher.css') }}">
+{% endblock %}
+
+{% block content %}
+<header class="w-header">
+  <a href="{{ url_for('watcher.dashboard') }}" class="w-header__back">← 戻る</a>
+  <div class="w-header__logo">🫀 心不全見守り</div>
+  <div></div>
+</header>
+
+<main class="w-container">
+  <h1 class="w-page-title">家族を追加</h1>
+  <p class="w-page-subtitle">親から受け取った招待リンクまたはコードを入力してください。</p>
+
+  <form method="POST" action="{{ url_for('watcher.join') }}" class="w-join-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="w-join-field">
+      <label class="w-join-label" for="token">招待リンク / コード</label>
+      <input type="text" id="token" name="token"
+             class="w-join-input"
+             placeholder="https://... または トークンコードを貼り付け"
+             autocomplete="off" required>
+    </div>
+
+    <button type="submit" class="w-join-btn">登録する</button>
+  </form>
+</main>
+{% endblock %}

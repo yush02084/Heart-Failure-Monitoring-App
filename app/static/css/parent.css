@@ -1,11 +1,23 @@
-/* =========================================== parent.css — 親（患者）画面専用スタイル 高齢者向け: 大きなフォント・タッチターゲット =========================================== */
+/* ===========================================
+   parent.css — 親（患者）画面専用スタイル
+   高齢者向け: 大きなフォント・タッチターゲット
+   =========================================== */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap');
 
 :root {
   --primary: #006269;
   --primary-dark: #004f55;
   --danger: #b7131a;
+  --danger-border: #ffb4ac;
   --warning: #856404;
+  --warning-border: #f0b445;
+  --success: #155724;
+  --success-bg: #d4edda;
+  --done-border: #6db68a;
+  --done-bg: #f0faf4;
+  --pending-border: #f0b445;
+  --pending-bg: #fffbf0;
+  --warn-bg: #fff8f0;
   --bg: #f3faff;
   --surface: #ffffff;
   --surface-low: #e6f6ff;
@@ -76,6 +88,30 @@ body {
   margin-bottom: 4px;
 }
 
+.p-page-subtitle {
+  font-size: 16px;
+  color: var(--on-surface-muted);
+  margin-bottom: 20px;
+}
+
+/* 日付表示 */
+.p-date {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--on-surface-muted);
+  margin-bottom: 20px;
+}
+
+/* 会話UI（挨拶） */
+.p-greeting-box {
+  background: var(--surface-low);
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  font-size: 20px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
 /* 今日のカード */
 .p-today-card {
   background: var(--surface);
@@ -90,13 +126,13 @@ body {
 }
 
 .p-today-card--done {
-  border-color: #6db68a;
-  background: #f0faf4;
+  border-color: var(--done-border);
+  background: var(--done-bg);
 }
 
 .p-today-card--pending {
-  border-color: #f0b445;
-  background: #fffbf0;
+  border-color: var(--pending-border);
+  background: var(--pending-bg);
 }
 
 .p-today-card__body {
@@ -125,9 +161,8 @@ body {
   transition: opacity 0.15s;
 }
 
-.p-btn:active {
-  opacity: 0.85;
-}
+.p-btn:hover { opacity: 0.88; }
+.p-btn:active { opacity: 0.75; }
 
 .p-btn--primary {
   background: var(--primary);
@@ -203,27 +238,13 @@ body {
   border-radius: 9999px;
   font-size: 15px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
-.alert-0 {
-  background: #e0e0e0;
-  color: #555;
-}
-
-.alert-1 {
-  background: #c8f7dc;
-  color: #0f5132;
-}
-
-.alert-2 {
-  background: #ffe69c;
-  color: #7a5c00;
-}
-
-.alert-3 {
-  background: #f5c2c7;
-  color: #842029;
-}
+.alert-0 { background: #e0e0e0; color: #3a3a3a; } /* contrast 6.4:1 */
+.alert-1 { background: #c8f7dc; color: #0f5132; }
+.alert-2 { background: #ffe69c; color: #7a5c00; }
+.alert-3 { background: #f5c2c7; color: #842029; }
 
 /* 入力フォーム */
 .p-input-form {
@@ -245,21 +266,20 @@ body {
   margin-bottom: 16px;
 }
 
-/* 体重 */
+/* 体重表示 */
 .p-weight-display {
   display: flex;
   justify-content: center;
   align-items: baseline;
   gap: 8px;
   font-family: 'Inter', sans-serif;
-  font-size: 52px;
-  font-weight: 700;
   color: var(--primary);
   padding: 16px 0;
 }
 
 .p-weight-number {
   font-size: 56px;
+  font-weight: 700;
 }
 
 .p-weight-unit {
@@ -279,17 +299,29 @@ body {
   background: var(--surface-low);
   border: 1px solid var(--outline-variant);
   border-radius: var(--radius);
+  font-family: 'Inter', sans-serif;
   font-size: 24px;
   font-weight: 600;
+  color: var(--on-surface);
   cursor: pointer;
+  transition: background 0.1s;
 }
+
+.p-numpad__key:hover { background: var(--outline-variant); }
+.p-numpad__key:active { background: var(--outline-variant); }
 
 .p-numpad__key--del {
   background: #f8d7da;
   color: var(--danger);
+  border-color: var(--danger-border);
 }
 
-/* 息切れ */
+.p-numpad__key:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* 息切れ選択 */
 .p-breath-choices {
   display: flex;
   flex-direction: column;
@@ -305,27 +337,97 @@ body {
   background: var(--surface-low);
   border: 1.5px solid var(--outline-variant);
   border-radius: var(--radius-lg);
+  cursor: pointer;
+  color: #000;
 }
 
-.p-breath-sub {
+.p-breath-choice input[type="radio"] {
+  width: 24px;
+  height: 24px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.p-breath-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.p-breath-main { font-weight: 700; }
+.p-breath-sub { font-size: 14px; color: var(--on-surface-muted); }
+.p-breath-desc { font-size: 14px; opacity: 0.8; }
+
+/* 息切れの色分け（alert-N クラスを直接使用） */
+.p-breath-choice.alert-1 { background: #e6f4ea; border-color: #8fd19e; }
+.p-breath-choice.alert-2 { background: #fff3cd; border-color: #e0c36c; }
+.p-breath-choice.alert-3 { background: #f8d7da; border-color: #d88a8f; }
+
+/* お知らせ */
+.p-notice {
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  margin-bottom: 16px;
+}
+
+.p-notice--info {
+  background: var(--surface-low);
+  color: var(--primary);
+  border-left: 4px solid var(--primary);
+}
+
+/* エラー */
+.p-field-error {
   font-size: 14px;
+  color: var(--danger);
+  margin-top: 6px;
+}
+
+/* 招待カード */
+.p-invite-card {
+  background: var(--surface);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.p-invite-desc {
+  font-size: 15px;
   color: var(--on-surface-muted);
+  margin-bottom: 16px;
 }
 
-.p-breath-main {
-  font-weight: 700;
-}
+.p-invite-result { margin-top: 16px; }
 
-.p-breath-desc {
-  opacity: 0.8;
-}
-
-/* 日付 */
-.p-date {
-  font-size: 22px;
-  font-weight: 600;
+.p-invite-label {
+  font-size: 13px;
   color: var(--on-surface-muted);
-  margin-bottom: 20px;
+  margin-bottom: 8px;
+}
+
+.p-invite-url-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.p-invite-url {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius);
+  font-size: 13px;
+  color: var(--on-surface);
+  background: var(--surface-low);
+  min-width: 0;
+}
+
+.p-invite-copy-msg {
+  font-size: 13px;
+  color: var(--success);
+  margin-top: 8px;
 }
 
 /* ボトムナビ */
@@ -340,42 +442,66 @@ body {
   display: flex;
   justify-content: space-around;
   align-items: center;
+  z-index: 100;
 }
 
 .p-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 60px;
+  min-height: 60px;
+  padding: 8px;
+  color: var(--on-surface-muted);
+  text-decoration: none;
   font-size: 12px;
+  font-weight: 500;
+  border-radius: var(--radius);
+  justify-content: center;
 }
 
-/* 会話UI（吹き出し） */
-.p-greeting-box {
-  background: var(--surface-low);
-  padding: 16px;
-  border-radius: var(--radius-lg);
-  font-size: 20px;
-  line-height: 1.6;
-  margin-bottom: 16px;
+.p-nav-item--active { color: var(--primary); }
+.p-nav-item__icon { font-size: 24px; }
+.p-nav-item--btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Noto Sans JP', sans-serif;
 }
 
-/* 文字はすべて黒に統一 */
-.p-breath-choice {
-  color: #000;
+.p-header__logout-form { display: none; }
+
+@media (min-width: 768px) {
+  body { padding-bottom: 0; }
+  .p-container { max-width: 720px; padding-top: 32px; }
+  .p-bottom-nav { display: none; }
+  .p-header__logout-form { display: block; }
+  .p-header__logout {
+    background: transparent;
+    border: 1.5px solid var(--outline-variant);
+    border-radius: var(--radius);
+    padding: 6px 14px;
+    font-size: 14px;
+    color: var(--on-surface-muted);
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .p-header__logout:hover { background: var(--surface-low); }
 }
 
-/* 落ち着いた色に調整 */
-.p-breath-choice.alert-1 {
-  background: #e6f4ea;
-  /* 薄い落ち着いた緑 */
-  border-color: #8fd19e;
+/* 小画面（320px）対応 */
+@media (max-width: 380px) {
+  body { font-size: 16px; }
+  .p-container { padding: 16px 12px; }
+  .p-header { padding: 10px 12px; }
+  .p-weight-number { font-size: 42px; }
+  .p-numpad__key { min-height: 56px; font-size: 20px; }
+  .p-table th, .p-table td { padding: 10px 8px; font-size: 14px; }
 }
 
-.p-breath-choice.alert-2 {
-  background: #fff3cd;
-  /* やわらかい黄色 */
-  border-color: #e0c36c;
-}
-
-.p-breath-choice.alert-3 {
-  background: #f8d7da;
-  /* 少し淡い赤 */
-  border-color: #d88a8f;
+/* フォーカス共通 */
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
 }

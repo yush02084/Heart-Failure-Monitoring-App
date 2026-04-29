@@ -9,15 +9,15 @@
 <header class="w-header">
   <div class="w-header__logo">🫀 心不全見守り</div>
   <div class="w-header__actions">
-    <span class="w-header__icon">🔔</span>
-    <a href="{{ url_for('watcher.dashboard') }}" class="w-header__icon" title="一覧に戻る">← 一覧</a>
+    <button class="w-header__icon" aria-label="通知" title="通知">🔔</button>
+    <a href="{{ url_for('watcher.dashboard') }}" class="w-header__icon" aria-label="一覧に戻る" title="一覧に戻る">← 一覧</a>
   </div>
 </header>
 
 <main class="w-container">
 
   {% if today_alert.level >= 2 %}
-  <div class="w-alert-banner w-alert-banner--{% if today_alert.level == 3 %}danger{% else %}warning{% endif %}">
+  <div class="w-alert-banner w-alert-banner--{% if today_alert.level == 3 %}danger{% else %}warning{% endif %}" role="alert">
     <span class="w-alert-banner__icon">⚠️</span>
     <div>
       <div class="w-alert-banner__title">
@@ -64,7 +64,7 @@
     </div>
     <div class="w-stats-chip {% if today.breath_condition >= 3 %}w-stats-chip--danger{% elif today.breath_condition == 2 %}w-stats-chip--warning{% endif %}">
       <div class="w-stats-chip__label">息切れ</div>
-      <div class="w-stats-chip__value" style="font-size:15px; font-family:'Noto Sans JP',sans-serif;">{{ today.breath_label }}</div>
+      <div class="w-stats-chip__value w-stats-chip__value--text">{{ today.breath_label }}</div>
     </div>
   </div>
   {% endif %}
@@ -74,22 +74,22 @@
     <table class="w-table">
       <thead>
         <tr>
-          <th>日付</th>
-          <th>体重</th>
-          <th>息切れ</th>
-          <th>状態</th>
+          <th scope="col">日付</th>
+          <th scope="col">体重</th>
+          <th scope="col">息切れ</th>
+          <th scope="col">状態</th>
         </tr>
       </thead>
       <tbody>
         {% for r in recent_records %}
         <tr>
           <td>{{ r.date_str }}</td>
-          <td style="font-family:'Inter',sans-serif; font-weight:600;">{{ "%.1f"|format(r.weight) }} kg</td>
+          <td class="w-table__weight">{{ "%.1f"|format(r.weight) }} kg</td>
           <td class="{% if r.breath_condition >= 3 %}text-danger{% elif r.breath_condition == 2 %}text-warning{% endif %}">{{ r.breath_label }}</td>
           <td><span class="w-table__status {{ r.alert_color_class }}">{{ r.alert_emoji }} {{ r.alert_label }}</span></td>
         </tr>
         {% else %}
-        <tr><td colspan="4" style="text-align:center; color: var(--outline); padding: 24px;">記録なし</td></tr>
+        <tr><td colspan="4" class="w-table__empty">記録なし</td></tr>
         {% endfor %}
       </tbody>
     </table>
@@ -103,6 +103,11 @@
   </a>
   <a href="#" class="w-nav-item w-nav-item--active"><span class="w-nav-item__icon">📊</span>生体データ</a>
   <a href="#" class="w-nav-item"><span class="w-nav-item__icon">🔔</span>通知</a>
-  <a href="#" class="w-nav-item"><span class="w-nav-item__icon">⚙️</span>設定</a>
+  <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="w-nav-item w-nav-item--btn">
+      <span class="w-nav-item__icon">🚪</span>ログアウト
+    </button>
+  </form>
 </nav>
 {% endblock %}

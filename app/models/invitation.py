@@ -15,4 +15,8 @@ class Invitation(db.Model):
     parent = db.relationship("User", foreign_keys=[parent_user_id])
 
     def is_valid(self):
-        return self.used_at is None and self.expires_at > now_jst()
+        expires = self.expires_at
+        if expires.tzinfo is None:
+            from datetime import timezone, timedelta
+            expires = expires.replace(tzinfo=timezone(timedelta(hours=9)))
+        return self.used_at is None and expires > now_jst()

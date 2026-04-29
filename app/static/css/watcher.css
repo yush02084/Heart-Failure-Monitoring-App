@@ -9,10 +9,15 @@
   --primary:           #006269;
   --primary-dark:      #004f55;
   --primary-light:     #dbfbff;
+  --primary-shadow:    rgba(0, 98, 105, 0.08);
   --danger:            #b7131a;
   --danger-bg:         #ffdad6;
+  --danger-border:     #ffb4ac;
   --warning-bg:        #fff3cd;
   --warning-text:      #856404;
+  --warning-border:    #f0c040;
+  --success:           #155724;
+  --success-bg:        #d4edda;
   --bg:                #f3faff;
   --surface:           #ffffff;
   --surface-low:       #e6f6ff;
@@ -44,15 +49,15 @@ body {
 a { color: inherit; text-decoration: none; }
 
 /* --- アラート色（base.cssと共有予定） --- */
-.alert-0 { background-color: #e0e0e0; color: #555; }
-.alert-1 { background-color: #d4edda; color: #155724; }
+.alert-0 { background-color: #e0e0e0; color: #3a3a3a; } /* contrast 6.4:1 (WCAG AA) */
+.alert-1 { background-color: var(--success-bg); color: var(--success); }
 .alert-2 { background-color: #fff3cd; color: #856404; }
 .alert-3 { background-color: #f8d7da; color: #721c24; }
 
 /* --- テキスト色ユーティリティ --- */
 .text-danger  { color: var(--danger); }
 .text-warning { color: var(--warning-text); }
-.text-success { color: #155724; }
+.text-success { color: var(--success); }
 .text-muted   { color: var(--on-surface-muted); }
 
 /* ==============================
@@ -82,6 +87,20 @@ a { color: inherit; text-decoration: none; }
   font-size: 20px;
   color: var(--on-surface-muted);
   cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  background: none;
+  border: none;
+  padding: 0;
+  text-decoration: none;
+}
+.w-header__icon:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
 }
 
 /* ==============================
@@ -121,7 +140,7 @@ a { color: inherit; text-decoration: none; }
 }
 .w-alert-banner--warning {
   background-color: var(--warning-bg);
-  border-left: 4px solid #f59e0b;
+  border-left: 4px solid var(--warning-border);
 }
 .w-alert-banner__icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
 .w-alert-banner__title {
@@ -187,7 +206,7 @@ a { color: inherit; text-decoration: none; }
   font-weight: 600;
   margin-bottom: 14px;
 }
-.w-badge--alert-0 { background: #e0e0e0; color: #555; }
+.w-badge--alert-0 { background: #e0e0e0; color: #3a3a3a; }
 .w-badge--alert-1 { background: #d4edda; color: #155724; }
 .w-badge--alert-2 { background: var(--warning-bg); color: var(--warning-text); }
 .w-badge--alert-3 { background: var(--danger-bg); color: var(--danger); }
@@ -239,6 +258,8 @@ a { color: inherit; text-decoration: none; }
   transition: opacity 0.15s, transform 0.1s;
   letter-spacing: 0.02em;
 }
+.w-btn-call:hover  { opacity: 0.92; }
+.w-btn-call--outline:hover { background: var(--primary-light); }
 .w-btn-call:active { opacity: 0.85; transform: scale(0.99); }
 
 .w-btn-call--primary { background: var(--primary); color: white; }
@@ -271,6 +292,18 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   gap: 8px;
 }
+/* alert_level 3: 電話ボタンを全幅・最上位に */
+.w-card-actions--emergency {
+  flex-direction: column;
+}
+.w-card-actions--emergency .w-btn-call--sm {
+  flex: none;
+  width: 100%;
+}
+.w-card-actions--emergency .w-btn-call--outline {
+  min-height: 44px;
+  font-size: 14px;
+}
 
 /* ==============================
    「家族を追加」カード
@@ -285,7 +318,8 @@ a { color: inherit; text-decoration: none; }
   cursor: pointer;
   transition: border-color 0.15s;
 }
-.w-add-card:hover { border-color: var(--primary); }
+.w-add-card:hover { border-color: var(--primary); background: var(--primary-light); }
+.w-add-card:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; border-color: var(--primary); }
 .w-add-card__icon  { font-size: 28px; margin-bottom: 8px; }
 .w-add-card__label { font-size: 16px; font-weight: 500; color: var(--primary); }
 .w-add-card__sub   { font-size: 13px; margin-top: 4px; }
@@ -310,8 +344,10 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   min-width: 60px;
+  min-height: 60px;
   padding: 8px;
   color: var(--on-surface-muted);
   font-size: 11px;
@@ -319,7 +355,12 @@ a { color: inherit; text-decoration: none; }
   border-radius: var(--radius);
   transition: color 0.15s;
 }
+.w-nav-item:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: -2px;
+}
 .w-nav-item--active { color: var(--primary); }
+.w-nav-item--btn { background: none; border: none; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; }
 .w-nav-item__icon { font-size: 22px; line-height: 1; }
 
 /* ==============================
@@ -359,11 +400,11 @@ a { color: inherit; text-decoration: none; }
 }
 .w-stats-chip--danger {
   background: var(--danger-bg);
-  border-color: #ffb4ac;
+  border-color: var(--danger-border);
 }
 .w-stats-chip--warning {
   background: var(--warning-bg);
-  border-color: #f0c040;
+  border-color: var(--warning-border);
 }
 .w-stats-chip__label {
   font-size: 11px;
@@ -414,6 +455,10 @@ a { color: inherit; text-decoration: none; }
   vertical-align: middle;
 }
 .w-table tr:last-child td { border-bottom: none; }
+.w-table__weight { font-family: 'Inter', sans-serif; font-weight: 600; }
+.w-table__empty { text-align: center; color: var(--outline); padding: 24px; }
+.w-stats-chip__value--text { font-size: 15px; font-family: 'Noto Sans JP', sans-serif; white-space: nowrap; }
+.w-empty-state { color: var(--on-surface-muted); text-align: center; padding: 32px 0; grid-column: span 2; }
 .w-table__status {
   display: inline-flex;
   align-items: center;
@@ -422,6 +467,7 @@ a { color: inherit; text-decoration: none; }
   border-radius: var(--radius-full);
   font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 /* ==============================
@@ -477,4 +523,86 @@ a { color: inherit; text-decoration: none; }
   /* テーブルフォント少し大きく */
   .w-table { font-size: 15px; }
   .w-table th { font-size: 13px; }
+}
+
+/* 小画面（320px）対応 */
+@media (max-width: 380px) {
+  .w-container { padding: 16px 12px; }
+  .w-header { padding: 8px 12px; }
+  .w-table { font-size: 12px; }
+  .w-table th, .w-table td { padding: 8px 6px; }
+  .w-stats-grid { gap: 6px; }
+  .w-stats-chip { padding: 10px 6px; }
+  .w-stats-chip__value { font-size: 16px; }
+}
+
+/* joinページ */
+.w-header__back {
+  font-size: 15px;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.w-join-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.w-join-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.w-join-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.w-join-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--outline-variant);
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--surface);
+  color: var(--on-surface);
+  box-sizing: border-box;
+}
+
+.w-join-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.w-join-btn {
+  min-height: 56px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-xl);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.w-join-btn:active { opacity: 0.85; }
+
+/* w-add-card をリンクとして使う */
+a.w-add-card {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* フォーカス共通 */
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
 }

@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from app.auth import bp
-from app.auth.forms import LoginForm, RegisterWatcherForm
+from app.auth.forms import LoginForm, RegisterWatcherForm, RegisterParentForm
 from app.extensions import db, bcrypt
 from app.models import User, Invitation, WatchRelationship
 from app.core.tz import now_jst
@@ -115,6 +115,39 @@ def register_watcher(token):
         return redirect(url_for("watcher.dashboard"))
 
     return render_template("auth/register_watcher.html", form=form, parent_name=parent.name, token=token)
+
+
+@bp.route("/register/parent", methods=["GET", "POST"])
+def register_parent():
+    if current_user.is_authenticated:
+        return _redirect_by_role(current_user)
+
+    form = RegisterParentForm()
+    if form.validate_on_submit():
+        if User.query.filter_by(login_id=form.login_id.data).filter(User.deleted_at.is_(None)).first():
+            flash("このログインIDはすでに使われています。", "error")
+            return render_template("auth/register_parent.html", form=form)
+
+        pw_hash = bcrypt.generate_password_hash(form.pin.data).decode("utf-8")
+        parent = User(
+            login_id=form.login_id.data,
+            pin_hash=pw_hash,
+            role="parent",
+            name=form.name.data,
+            phone_number=form.phone_number.data or None,
+            base_weight=float(form.base_weight.data),
+            base_weight_updated_at=now_jst(),
+        )
+        db.session.add(parent)
+        try:
+            db.session.commit()
+            login_user(parent)
+            return redirect(url_for("parent.home"))
+        except Exception:
+            db.session.rollback()
+            flash("登録に失敗しました。しばらく後にお試しください。", "error")
+
+    return render_template("auth/register_parent.html", form=form)
 
 
 def _redirect_by_role(user):

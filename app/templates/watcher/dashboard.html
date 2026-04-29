@@ -9,8 +9,8 @@
 <header class="w-header">
   <div class="w-header__logo">🫀 心不全見守り</div>
   <div class="w-header__actions">
-    <span class="w-header__icon" title="通知">🔔</span>
-    <span class="w-header__icon" title="アカウント">👤</span>
+    <button class="w-header__icon" aria-label="通知" title="通知">🔔</button>
+    <button class="w-header__icon" aria-label="アカウント設定" title="アカウント">👤</button>
   </div>
 </header>
 
@@ -30,7 +30,8 @@
         </div>
       </div>
 
-      <div class="w-badge w-badge--alert-{{ p.alert_level }}">{{ p.alert_emoji }} {{ p.alert_label }}</div>
+      <div class="w-badge w-badge--alert-{{ p.alert_level }}"
+           aria-label="状態: {{ p.alert_label }}">{{ p.alert_emoji }} {{ p.alert_label }}</div>
 
       <div class="w-stat-row">
         {% if p.latest_record %}
@@ -62,28 +63,28 @@
         </div>
       </div>
 
-      <div class="w-card-actions">
-        <a href="{{ url_for('watcher.parent_detail', parent_id=p.parent_id) }}" class="w-btn-call w-btn-call--outline w-btn-call--sm">
-          📋 詳細を見る
-        </a>
+      <div class="w-card-actions {% if p.alert_level == 3 %}w-card-actions--emergency{% endif %}">
         {% if p.alert_level >= 2 %}
         <a href="{{ p.tel_link }}" class="w-btn-call w-btn-call--danger w-btn-call--sm">
           📞 電話する
         </a>
         {% endif %}
+        <a href="{{ url_for('watcher.parent_detail', parent_id=p.parent_id) }}" class="w-btn-call w-btn-call--outline w-btn-call--sm">
+          📋 詳細を見る
+        </a>
       </div>
 
     </div>
     {% else %}
-    <p style="color: var(--on-surface-muted); text-align: center; padding: 32px 0; grid-column: span 2;">見守り対象はまだいません。</p>
+    <p class="w-empty-state">見守り対象はまだいません。</p>
     {% endfor %}
   </div>
 
-  <div class="w-add-card">
+  <a href="{{ url_for('watcher.join') }}" class="w-add-card" aria-label="その他の家族を追加">
     <div class="w-add-card__icon">👥</div>
     <div class="w-add-card__label">その他の家族を追加</div>
-    <div class="w-add-card__sub">見守り対象者を追加します</div>
-  </div>
+    <div class="w-add-card__sub">招待リンクで見守り対象者を追加します</div>
+  </a>
 </main>
 
 <nav class="w-bottom-nav">
@@ -92,6 +93,11 @@
   </a>
   <a href="#" class="w-nav-item"><span class="w-nav-item__icon">📊</span>生体データ</a>
   <a href="#" class="w-nav-item"><span class="w-nav-item__icon">🔔</span>通知</a>
-  <a href="#" class="w-nav-item"><span class="w-nav-item__icon">⚙️</span>設定</a>
+  <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="w-nav-item w-nav-item--btn">
+      <span class="w-nav-item__icon">🚪</span>ログアウト
+    </button>
+  </form>
 </nav>
 {% endblock %}

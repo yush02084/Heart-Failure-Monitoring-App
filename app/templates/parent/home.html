@@ -9,6 +9,10 @@
 <header class="p-header">
   <div class="p-header__logo">🫀 心不全見守り</div>
   <div class="p-header__name">{{ user.name }} さん</div>
+  <form method="POST" action="{{ url_for('auth.logout') }}" class="p-header__logout-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="p-header__logout">ログアウト</button>
+  </form>
 </header>
 
 <main class="p-container">
@@ -39,6 +43,8 @@
   </a>
 
   {% endif %}
+
+  {% include "parent/_invite_card.html" %}
 
   {% if recent_records %}
   <section class="p-section">
@@ -87,5 +93,49 @@
     </button>
   </form>
 </nav>
+
+{% block extra_js %}
+<script>
+  const INVITE_URL = "{{ url_for('parent.invite') }}";
+  const CSRF_TOKEN = "{{ csrf_token() }}";
+
+  function generateInvite() {
+    const btn = document.getElementById('invite-btn');
+    btn.disabled = true;
+    btn.textContent = '発行中...';
+
+    fetch(INVITE_URL, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': CSRF_TOKEN, 'Content-Type': 'application/json' },
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.url) {
+        document.getElementById('invite-url').value = data.url;
+        document.getElementById('invite-result').style.display = 'block';
+      } else {
+        alert('招待リンクの発行に失敗しました。');
+      }
+      btn.disabled = false;
+      btn.textContent = '🔗 招待リンクを再発行する';
+    })
+    .catch(() => {
+      alert('通信エラーが発生しました。');
+      btn.disabled = false;
+      btn.textContent = '🔗 招待リンクを発行する';
+    });
+  }
+
+  function copyInvite() {
+    const url = document.getElementById('invite-url');
+    url.select();
+    navigator.clipboard.writeText(url.value).then(() => {
+      const msg = document.getElementById('copy-msg');
+      msg.style.display = 'block';
+      setTimeout(() => { msg.style.display = 'none'; }, 2000);
+    });
+  }
+</script>
+{% endblock %}
 
 {% endblock %}
