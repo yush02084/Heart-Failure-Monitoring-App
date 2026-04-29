@@ -74,7 +74,15 @@ def get_dashboard_context(watcher: User) -> dict:
 
     # 警戒→注意→通常の順でソート
     watched_parents.sort(key=lambda x: x["alert_level"], reverse=True)
-    return {"user": _user_dict(watcher), "watched_parents": watched_parents}
+
+    # 通知バッジ数（alert_level >= 2 または 2日以上未入力）
+    unread_count = sum(
+        1 for p in watched_parents
+        if p["alert_level"] >= 2 or (p["days_since_last_input"] is not None and p["days_since_last_input"] >= 2)
+        or p["days_since_last_input"] is None
+    )
+
+    return {"user": _user_dict(watcher), "watched_parents": watched_parents, "unread_count": unread_count}
 
 
 def get_parent_detail_context(watcher: User, parent_id: int) -> dict | None:

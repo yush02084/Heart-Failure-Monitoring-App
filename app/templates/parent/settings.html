@@ -41,6 +41,12 @@
       </div>
 
       <div class="p-settings-field">
+        <label class="p-settings-label">{{ form.new_login_id.label.text }}</label>
+        {{ form.new_login_id(class="p-settings-input", placeholder="新しいログインID（変更しない場合は空欄）") }}
+        {% for e in form.new_login_id.errors %}<div class="p-field-error">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="p-settings-field">
         <label class="p-settings-label">{{ form.base_weight.label.text }} <span class="p-required">*</span></label>
         {{ form.base_weight(class="p-settings-input", placeholder="例: 60.0") }}
         <div class="p-settings-hint">アラート判定の基準になります</div>

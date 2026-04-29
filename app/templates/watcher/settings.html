@@ -44,6 +44,12 @@
         {{ form.email(class="reg-input", placeholder="例: taro@example.com", type="email") }}
         {% for e in form.email.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
       </div>
+
+      <div class="reg-field">
+        <label>{{ form.new_login_id.label.text }}</label>
+        {{ form.new_login_id(class="reg-input", placeholder="新しいログインID（変更しない場合は空欄）") }}
+        {% for e in form.new_login_id.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+      </div>
     </div>
 
     <!-- パスワード変更 -->

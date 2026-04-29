@@ -39,6 +39,8 @@ class RegisterParentForm(FlaskForm):
 class ParentSettingsForm(FlaskForm):
     name            = StringField("お名前", validators=[DataRequired(), Length(1, 20)])
     phone_number    = StringField("電話番号", validators=[Optional(), Length(max=20)])
+    new_login_id    = StringField("新しいログインID（変更する場合）",
+                          validators=[Optional(), Length(4, 20)])
     base_weight     = DecimalField("基準体重（kg）", places=1, validators=[
                           DataRequired(message="基準体重を入力してください"),
                           NumberRange(min=20.0, max=300.0, message="20〜300kgの範囲で入力してください")
@@ -54,6 +56,8 @@ class WatcherSettingsForm(FlaskForm):
     name                 = StringField("お名前", validators=[DataRequired(), Length(1, 20)])
     phone_number         = StringField("電話番号", validators=[Optional(), Length(max=20)])
     email                = StringField("メールアドレス", validators=[Optional(), Length(max=120)])
+    new_login_id         = StringField("新しいログインID（変更する場合）",
+                               validators=[Optional(), Length(4, 20)])
     current_password     = PasswordField("現在のパスワード", validators=[DataRequired()])
     new_password         = PasswordField("新しいパスワード（変更する場合）",
                                validators=[Optional(), Length(8)])

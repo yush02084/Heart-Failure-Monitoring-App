@@ -51,6 +51,18 @@ def create_app(config_class=Config):
             return redirect(url_for("parent.home"))
         return redirect(url_for("watcher.dashboard"))
 
+    # エラーハンドラ
+    from flask import render_template as _rt
+
+    @app.errorhandler(404)
+    def not_found(e):
+        return _rt("errors/404.html"), 404
+
+    @app.errorhandler(500)
+    def internal_error(e):
+        db.session.rollback()
+        return _rt("errors/500.html"), 500
+
     # DB初期化（マイグレーション実行後にシード）
     with app.app_context():
         _seed_if_empty()

@@ -87,6 +87,16 @@ def settings():
             flash("現在のパスワードが正しくありません。", "error")
             return render_template("watcher/settings.html", form=form, relationships=relationships)
 
+        if form.new_login_id.data:
+            from app.models.user import User as _User
+            dup = _User.query.filter_by(login_id=form.new_login_id.data)\
+                             .filter(_User.deleted_at.is_(None))\
+                             .filter(_User.id != current_user.id).first()
+            if dup:
+                flash("このログインIDはすでに使われています。", "error")
+                return render_template("watcher/settings.html", form=form, relationships=relationships)
+            current_user.login_id = form.new_login_id.data
+
         current_user.name = form.name.data
         current_user.phone_number = form.phone_number.data or None
         current_user.email = form.email.data or None
@@ -121,3 +131,18 @@ def unwatch(parent_id):
     db.session.commit()
     flash("見守りを解除しました。", "success")
     return redirect(url_for("watcher.settings"))
+
+
+@bp.route("/notifications")
+@login_required
+def notifications():
+    if not current_user.is_watcher():
+        abort(403)
+    ctx = get_dashboard_context(current_user)
+    notifs = [
+        p for p in ctx["watched_parents"]
+        if p["alert_level"] >= 2
+        or p["days_since_last_input"] is None
+        or p["days_since_last_input"] >= 2
+    ]
+    return render_template("watcher/notifications.html", notifs=notifs, user=ctx["user"])

@@ -9,7 +9,7 @@
 <header class="w-header">
   <div class="w-header__logo">🫀 心不全見守り</div>
   <div class="w-header__actions">
-    <button class="w-header__icon" aria-label="通知" title="通知">🔔</button>
+    <a href="{{ url_for('watcher.notifications') }}" class="w-header__icon w-header__notif" aria-label="通知" title="通知" style="text-decoration:none;">🔔{% if unread_count > 0 %}<span class="w-badge-count">{{ unread_count }}</span>{% endif %}</a>
     <a href="{{ url_for('watcher.settings') }}" class="w-header__icon" aria-label="アカウント設定" title="アカウント設定" style="text-decoration:none;">👤</a>
     <form method="POST" action="{{ url_for('auth.logout') }}" class="w-header__logout-form">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -96,7 +96,7 @@
     <span class="w-nav-item__icon">⊞</span>ダッシュボード
   </a>
   <a href="#" class="w-nav-item"><span class="w-nav-item__icon">📊</span>生体データ</a>
-  <a href="#" class="w-nav-item"><span class="w-nav-item__icon">🔔</span>通知</a>
+  <a href="{{ url_for('watcher.notifications') }}" class="w-nav-item"><span class="w-nav-item__icon">🔔</span>通知{% if unread_count > 0 %}<span class="w-badge-count w-badge-count--nav">{{ unread_count }}</span>{% endif %}</a>
   <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <button type="submit" class="w-nav-item w-nav-item--btn">

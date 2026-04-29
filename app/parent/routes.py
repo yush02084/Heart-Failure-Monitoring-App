@@ -120,6 +120,16 @@ def settings():
             flash("現在のPINが正しくありません。", "error")
             return render_template("parent/settings.html", form=form)
 
+        if form.new_login_id.data:
+            from app.models.user import User as _User
+            dup = _User.query.filter_by(login_id=form.new_login_id.data)\
+                             .filter(_User.deleted_at.is_(None))\
+                             .filter(_User.id != current_user.id).first()
+            if dup:
+                flash("このログインIDはすでに使われています。", "error")
+                return render_template("parent/settings.html", form=form)
+            current_user.login_id = form.new_login_id.data
+
         current_user.name = form.name.data
         current_user.phone_number = form.phone_number.data or None
         current_user.base_weight = float(form.base_weight.data)

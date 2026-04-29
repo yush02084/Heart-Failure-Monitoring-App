@@ -672,3 +672,89 @@ a.w-add-card {
 }
 
 .w-btn-unwatch:hover { background: #ffdad6; }
+
+/* --- 通知バッジ --- */
+.w-header__notif {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.w-badge-count {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  min-width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  pointer-events: none;
+}
+
+.w-badge-count--nav {
+  position: static;
+  margin-left: 4px;
+  font-size: 10px;
+}
+
+/* --- 通知ページ --- */
+.w-notif-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.w-notif-card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--outline-variant);
+  padding: 16px;
+}
+
+.w-notif-card--alert-2 { border-color: var(--warning-border); }
+.w-notif-card--alert-3 { border-color: var(--danger-border); }
+
+.w-notif-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.w-notif-card__name {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.w-notif-card__body {
+  margin-bottom: 12px;
+}
+
+.w-notif-card__msg {
+  font-size: 14px;
+  color: var(--on-surface-muted);
+  margin-bottom: 4px;
+}
+
+.w-notif-card__date {
+  font-size: 12px;
+  color: var(--outline);
+  margin-top: 6px;
+}
+
+.w-notif-card__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
