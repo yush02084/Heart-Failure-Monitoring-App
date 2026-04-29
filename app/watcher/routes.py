@@ -139,7 +139,7 @@ def notifications():
     if not current_user.is_watcher():
         abort(403)
     # 通知を見たタイムスタンプを更新（バッジクリア）
-    current_user.notifications_viewed_at = now_jst()
+    current_user.notifications_viewed_at = now_jst().replace(tzinfo=None)
     db.session.commit()
 
     ctx = get_dashboard_context(current_user)

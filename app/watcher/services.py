@@ -90,8 +90,15 @@ def get_dashboard_context(watcher: User) -> dict:
             unread_count += 1
         else:
             latest_rec = latest_map.get(p["parent_id"])
-            if latest_rec is None or latest_rec.updated_at > viewed_at:
+            if latest_rec is None:
                 unread_count += 1
+            else:
+                rec_time = latest_rec.updated_at
+                if rec_time and rec_time.tzinfo:
+                    rec_time = rec_time.replace(tzinfo=None)
+                vt = viewed_at.replace(tzinfo=None) if viewed_at.tzinfo else viewed_at
+                if rec_time > vt:
+                    unread_count += 1
 
     return {"user": _user_dict(watcher), "watched_parents": watched_parents, "unread_count": unread_count}
 
