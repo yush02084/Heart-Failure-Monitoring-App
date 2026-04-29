@@ -1,7 +1,4 @@
-/* ===========================================
-   parent.css — 親（患者）画面専用スタイル
-   高齢者向け: 大きなフォント・タッチターゲット
-   =========================================== */
+/* =========================================== parent.css — 親（患者）画面専用スタイル 高齢者向け: 大きなフォント・タッチターゲット =========================================== */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap');
 
 :root {
@@ -68,7 +65,7 @@ body {
 
 /* コンテナ */
 .p-container {
-  max-width: 480px;
+  max-width: 560px;
   margin: 0 auto;
   padding: 24px 20px;
 }
@@ -79,12 +76,6 @@ body {
   margin-bottom: 4px;
 }
 
-.p-page-subtitle {
-  font-size: 16px;
-  color: var(--on-surface-muted);
-  margin-bottom: 20px;
-}
-
 /* 今日のカード */
 .p-today-card {
   background: var(--surface);
@@ -93,6 +84,7 @@ body {
   padding: 20px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
   margin-bottom: 16px;
 }
@@ -107,30 +99,13 @@ body {
   background: #fffbf0;
 }
 
-.p-today-card__icon {
-  font-size: 28px;
-  flex-shrink: 0;
-}
-
 .p-today-card__body {
   flex: 1;
 }
 
-.p-today-card__label {
-  font-size: 17px;
+.p-today-main {
+  font-size: 26px;
   font-weight: 700;
-}
-
-.p-today-card__stats {
-  font-size: 15px;
-  color: var(--on-surface-muted);
-  margin-top: 4px;
-}
-
-.p-today-card__sub {
-  font-size: 14px;
-  color: var(--on-surface-muted);
-  margin-top: 4px;
 }
 
 /* ボタン */
@@ -219,14 +194,15 @@ body {
   border-bottom: none;
 }
 
+/* ステータス */
 .p-status {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 3px 10px;
   border-radius: 9999px;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .alert-0 {
@@ -235,18 +211,18 @@ body {
 }
 
 .alert-1 {
-  background: #d4edda;
-  color: #155724;
+  background: #c8f7dc;
+  color: #0f5132;
 }
 
 .alert-2 {
-  background: #fff3cd;
-  color: var(--warning);
+  background: #ffe69c;
+  color: #7a5c00;
 }
 
 .alert-3 {
-  background: #f8d7da;
-  color: var(--danger);
+  background: #f5c2c7;
+  color: #842029;
 }
 
 /* 入力フォーム */
@@ -269,15 +245,26 @@ body {
   margin-bottom: 16px;
 }
 
-/* 体重表示 */
+/* 体重 */
 .p-weight-display {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 8px;
   font-family: 'Inter', sans-serif;
   font-size: 52px;
   font-weight: 700;
   color: var(--primary);
-  text-align: center;
   padding: 16px 0;
-  letter-spacing: 2px;
+}
+
+.p-weight-number {
+  font-size: 56px;
+}
+
+.p-weight-unit {
+  font-size: 20px;
+  color: var(--on-surface-muted);
 }
 
 /* テンキー */
@@ -292,25 +279,17 @@ body {
   background: var(--surface-low);
   border: 1px solid var(--outline-variant);
   border-radius: var(--radius);
-  font-family: 'Inter', sans-serif;
   font-size: 24px;
   font-weight: 600;
-  color: var(--on-surface);
   cursor: pointer;
-  transition: background 0.1s;
-}
-
-.p-numpad__key:active {
-  background: var(--outline-variant);
 }
 
 .p-numpad__key--del {
   background: #f8d7da;
   color: var(--danger);
-  border-color: #ffb4ac;
 }
 
-/* 息切れ選択 */
+/* 息切れ */
 .p-breath-choices {
   display: flex;
   flex-direction: column;
@@ -326,48 +305,27 @@ body {
   background: var(--surface-low);
   border: 1.5px solid var(--outline-variant);
   border-radius: var(--radius-lg);
-  cursor: pointer;
-  font-size: 18px;
-  font-weight: 500;
 }
 
-.p-breath-choice input[type="radio"] {
-  width: 24px;
-  height: 24px;
-  accent-color: var(--primary);
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.p-breath-choice--warn {
-  background: #fff8f0;
-  border-color: #f0b445;
-}
-
-.p-breath-choice:has(input:checked) {
-  border-color: var(--primary);
-  background: var(--surface-low);
-}
-
-/* お知らせ */
-.p-notice {
-  padding: 12px 16px;
-  border-radius: var(--radius);
-  font-size: 15px;
-  margin-bottom: 16px;
-}
-
-.p-notice--info {
-  background: var(--surface-low);
-  color: var(--primary);
-  border-left: 4px solid var(--primary);
-}
-
-/* エラー */
-.p-field-error {
+.p-breath-sub {
   font-size: 14px;
-  color: var(--danger);
-  margin-top: 6px;
+  color: var(--on-surface-muted);
+}
+
+.p-breath-main {
+  font-weight: 700;
+}
+
+.p-breath-desc {
+  opacity: 0.8;
+}
+
+/* 日付 */
+.p-date {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--on-surface-muted);
+  margin-bottom: 20px;
 }
 
 /* ボトムナビ */
@@ -382,97 +340,42 @@ body {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  z-index: 100;
 }
 
 .p-nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  min-width: 60px;
-  padding: 8px;
-  color: var(--on-surface-muted);
-  text-decoration: none;
   font-size: 12px;
-  font-weight: 500;
-  border-radius: var(--radius);
 }
 
-.p-nav-item--active {
-  color: var(--primary);
-}
-
-.p-nav-item__icon {
-  font-size: 24px;
-}
-
-.p-nav-item--btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: 'Noto Sans JP', sans-serif;
-}
-
-@media (min-width: 768px) {
-  body {
-    padding-bottom: 0;
-  }
-
-  .p-container {
-    max-width: 720px;
-    padding-top: 32px;
-  }
-
-  .p-bottom-nav {
-    display: none;
-  }
-}
-
-.p-date {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-.p-weight-display {
-  display: flex;
-  justify-content: center;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.p-weight-number {
-  font-size: 56px;
-  font-weight: 700;
-}
-
-.p-weight-unit {
+/* 会話UI（吹き出し） */
+.p-greeting-box {
+  background: var(--surface-low);
+  padding: 16px;
+  border-radius: var(--radius-lg);
   font-size: 20px;
-  color: var(--on-surface-muted);
+  line-height: 1.6;
+  margin-bottom: 16px;
 }
 
-.p-breath-sub {
-  font-size: 14px;
-  color: var(--on-surface-muted);
+/* 文字はすべて黒に統一 */
+.p-breath-choice {
+  color: #000;
 }
 
-.p-date {
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--on-surface-muted);
-  margin-bottom: 20px;
+/* 落ち着いた色に調整 */
+.p-breath-choice.alert-1 {
+  background: #e6f4ea;
+  /* 薄い落ち着いた緑 */
+  border-color: #8fd19e;
 }
 
-/* 今日の状態（大きくシンプルに） */
-.p-today-main {
-  font-size: 26px;
-  font-weight: 700;
+.p-breath-choice.alert-2 {
+  background: #fff3cd;
+  /* やわらかい黄色 */
+  border-color: #e0c36c;
 }
 
-/* ボタン位置を整える（横並び対応） */
-.p-today-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.p-breath-choice.alert-3 {
+  background: #f8d7da;
+  /* 少し淡い赤 */
+  border-color: #d88a8f;
 }
