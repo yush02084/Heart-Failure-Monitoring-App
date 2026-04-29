@@ -33,18 +33,30 @@
         <span class="p-weight-number" id="weight-number">{{ form.weight.data or "- - -" }}</span>
         <span class="p-weight-unit">kg</span>
       </div>
-      <div class="p-weight-hint">例: 65.3 kg ／ 小数点以下1桁まで</div>
 
-      <!-- テンキー -->
+      <!-- テンキー（Bさんレイアウト: 0と⌫を最終行に独立配置） -->
       <div class="p-numpad" role="group" aria-label="体重入力テンキー">
-        {% for digit in ['7','8','9','4','5','6','1','2','3','.','0','⌫'] %}
+        {% for digit in ['7','8','9','4','5','6','1','2','3'] %}
         <button type="button"
-                class="p-numpad__key {% if digit == '⌫' %}p-numpad__key--del{% endif %}"
-                aria-label="{% if digit == '⌫' %}削除{% elif digit == '.' %}小数点{% else %}数字 {{ digit }}{% endif %}"
+                class="p-numpad__key"
+                aria-label="数字 {{ digit }}"
                 onclick="numpadPress('{{ digit }}')">
           {{ digit }}
         </button>
         {% endfor %}
+
+        <!-- 空セル -->
+        <div></div>
+
+        <!-- 0（中央） -->
+        <button type="button" class="p-numpad__key" aria-label="数字 0" onclick="numpadPress('0')">
+          0
+        </button>
+
+        <!-- 削除（右） -->
+        <button type="button" class="p-numpad__key p-numpad__key--del" aria-label="削除" onclick="numpadPress('⌫')">
+          ⌫
+        </button>
       </div>
 
       {{ form.weight(id="weight-input", type="hidden") }}
@@ -53,22 +65,21 @@
       {% endfor %}
     </div>
 
-    <!-- 息切れ -->
+    <!-- 息切れ（Bさんのalert色分け + checked状態保持） -->
     <div class="p-input-section">
       <h2 class="p-input-section__title">🌬️ 息切れの状態</h2>
 
       <div class="p-breath-choices">
+        {% set alert_classes = ['', 'alert-1', 'alert-2', 'alert-3', 'alert-3'] %}
+        {% set breath_descs = ['', 'いつも通り', '少し息切れ', '動くと息切れ', '安静でも息切れ'] %}
         {% for value, label in form.breath_condition.choices %}
-        <label class="p-breath-choice {% if loop.index >= 3 %}p-breath-choice--warn{% endif %}">
+        {% set v = value|int %}
+        <label class="p-breath-choice {{ alert_classes[v] }}">
           <input type="radio" name="breath_condition" value="{{ value }}"
                  {% if form.breath_condition.data == value %}checked{% endif %}>
-          <div>
-            <div>{{ label }}</div>
-            {% if value == '1' %}<div class="p-breath-sub">いつも通り</div>
-            {% elif value == '2' %}<div class="p-breath-sub">少し息切れがある</div>
-            {% elif value == '3' %}<div class="p-breath-sub">動くと息切れがある</div>
-            {% elif value == '4' %}<div class="p-breath-sub">安静でも息切れがある</div>
-            {% endif %}
+          <div class="p-breath-row">
+            <span class="p-breath-main">{{ label }}</span>
+            <span class="p-breath-desc">（{{ breath_descs[v] }}）</span>
           </div>
         </label>
         {% endfor %}
@@ -106,10 +117,8 @@
       } else {
         weightVal = weightVal.slice(0, -1);
       }
-    } else if (key === '.') {
-      if (!weightVal.includes('.')) weightVal += '.';
     } else {
-      if (weightVal.length >= 6) return;
+      if (weightVal.length >= 5) return;
       weightVal += key;
       // 整数部が2桁になったら自動で小数点を挿入
       if (!weightVal.includes('.') && weightVal.length === 2) {
