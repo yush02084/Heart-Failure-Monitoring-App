@@ -14,29 +14,36 @@
 <main class="p-container">
 
   <!-- 会話メッセージ -->
+  {% if today_record %}
+
   <div class="p-greeting-box">
-    <div class="p-greeting-text">
-      こんにちは、{{ user.name }}さん。<br>
-      今日の体調はいかがですか？<br>
-      それでは今日の体調を記録をしましょう。
-    </div>
+    こんにちは、{{ user.name }}さん。<br>
+    記録ありがとうございます。<br>
+    また明日も体調を教えてください。
   </div>
 
-  <!-- 入力ボタン（最重要） -->
-  <a href="{{ url_for('parent.input') }}" class="p-btn p-btn--primary p-btn--lg">
-    記録する
-  </a>
-
-  <!-- 記録済みの場合だけ表示 -->
-  {% if today_record %}
   <div class="p-today-card p-today-card--done">
     <div class="p-today-card__body">
       <div class="p-today-main">本日は記録済みです</div>
     </div>
-    <a href="{{ url_for('parent.input') }}" class="p-btn p-btn--outline p-btn--sm">
-      修正する
-    </a>
   </div>
+
+  <a href="{{ url_for('parent.input') }}" class="p-btn p-btn--outline">
+    修正する
+  </a>
+
+  {% else %}
+
+  <div class="p-greeting-box">
+    こんにちは、{{ user.name }}さん。<br>
+    今日の体調はいかがですか？<br>
+    それでは今日の体調を記録しましょう。
+  </div>
+
+  <a href="{{ url_for('parent.input') }}" class="p-btn p-btn--primary p-btn--lg">
+    記録する
+  </a>
+
   {% endif %}
 
   {% if recent_records %}
