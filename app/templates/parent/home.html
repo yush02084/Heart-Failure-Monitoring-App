@@ -22,14 +22,8 @@
     また明日も体調を教えてください。
   </div>
 
-  <div class="p-today-card p-today-card--done">
-    <div class="p-today-card__body">
-      <div class="p-today-main">本日は記録済みです</div>
-    </div>
-  </div>
-
-  <a href="{{ url_for('parent.input') }}" class="p-btn p-btn--outline">
-    修正する
+  <a href="{{ url_for('parent.input') }}" class="p-btn p-btn--primary p-btn--lg">
+    記録を修正する
   </a>
 
   {% else %}
