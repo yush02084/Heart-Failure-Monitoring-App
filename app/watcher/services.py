@@ -62,6 +62,7 @@ def get_dashboard_context(watcher: User) -> dict:
             "parent_id": parent.id,
             "parent_name": parent.name,
             "phone_number": parent.phone_number,
+            "tel_link": f"tel:{parent.phone_number}" if parent.phone_number else "#",
             "latest_record": rec_dict,
             "alert_level": alert_level,
             "alert_emoji": ALERT_EMOJI[alert_level],

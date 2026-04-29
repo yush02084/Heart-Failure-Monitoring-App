@@ -457,7 +457,7 @@ a { color: inherit; text-decoration: none; }
 .w-table tr:last-child td { border-bottom: none; }
 .w-table__weight { font-family: 'Inter', sans-serif; font-weight: 600; }
 .w-table__empty { text-align: center; color: var(--outline); padding: 24px; }
-.w-stats-chip__value--text { font-size: 15px; font-family: 'Noto Sans JP', sans-serif; }
+.w-stats-chip__value--text { font-size: 15px; font-family: 'Noto Sans JP', sans-serif; white-space: nowrap; }
 .w-empty-state { color: var(--on-surface-muted); text-align: center; padding: 32px 0; grid-column: span 2; }
 .w-table__status {
   display: inline-flex;
@@ -467,6 +467,7 @@ a { color: inherit; text-decoration: none; }
   border-radius: var(--radius-full);
   font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 /* ==============================
@@ -533,6 +534,71 @@ a { color: inherit; text-decoration: none; }
   .w-stats-grid { gap: 6px; }
   .w-stats-chip { padding: 10px 6px; }
   .w-stats-chip__value { font-size: 16px; }
+}
+
+/* joinページ */
+.w-header__back {
+  font-size: 15px;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.w-join-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.w-join-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.w-join-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.w-join-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--outline-variant);
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--surface);
+  color: var(--on-surface);
+  box-sizing: border-box;
+}
+
+.w-join-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.w-join-btn {
+  min-height: 56px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-xl);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.w-join-btn:active { opacity: 0.85; }
+
+/* w-add-card をリンクとして使う */
+a.w-add-card {
+  text-decoration: none;
+  color: inherit;
 }
 
 /* フォーカス共通 */

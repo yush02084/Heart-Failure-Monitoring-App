@@ -80,11 +80,11 @@
     {% endfor %}
   </div>
 
-  <div class="w-add-card" role="button" tabindex="0" aria-label="その他の家族を追加">
+  <a href="{{ url_for('watcher.join') }}" class="w-add-card" aria-label="その他の家族を追加">
     <div class="w-add-card__icon">👥</div>
     <div class="w-add-card__label">その他の家族を追加</div>
-    <div class="w-add-card__sub">見守り対象者を追加します</div>
-  </div>
+    <div class="w-add-card__sub">招待リンクで見守り対象者を追加します</div>
+  </a>
 </main>
 
 <nav class="w-bottom-nav">
