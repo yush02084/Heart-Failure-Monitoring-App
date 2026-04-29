@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}設定 — 心不全見守り{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/parent.css') }}">
+{% endblock %}
+
+{% block content %}
+<header class="p-header">
+  <div class="p-header__logo">🫀 心不全見守り</div>
+  <a href="{{ url_for('parent.home') }}" class="p-header__back">← 戻る</a>
+  <form method="POST" action="{{ url_for('auth.logout') }}" class="p-header__logout-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="p-header__logout">ログアウト</button>
+  </form>
+</header>
+
+<main class="p-container">
+  <h1 class="p-page-title">⚙️ アカウント設定</h1>
+
+  <form method="POST" class="p-input-form">
+    {{ form.hidden_tag() }}
+
+    <!-- 基本情報 -->
+    <div class="p-input-section">
+      <h2 class="p-input-section__title">基本情報</h2>
+
+      <div class="p-settings-field">
+        <label class="p-settings-label">{{ form.name.label.text }} <span class="p-required">*</span></label>
+        {{ form.name(class="p-settings-input", placeholder="お名前") }}
+        {% for e in form.name.errors %}<div class="p-field-error">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="p-settings-field">
+        <label class="p-settings-label">{{ form.phone_number.label.text }}</label>
+        {{ form.phone_number(class="p-settings-input", placeholder="例: 090-1234-5678") }}
+        {% for e in form.phone_number.errors %}<div class="p-field-error">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="p-settings-field">
+        <label class="p-settings-label">{{ form.base_weight.label.text }} <span class="p-required">*</span></label>
+        {{ form.base_weight(class="p-settings-input", placeholder="例: 60.0") }}
+        <div class="p-settings-hint">アラート判定の基準になります</div>
+        {% for e in form.base_weight.errors %}<div class="p-field-error">{{ e }}</div>{% endfor %}
+      </div>
+    </div>
+
+    <!-- PIN変更 -->
+    <div class="p-input-section">
+      <h2 class="p-input-section__title">PIN変更</h2>
+
+      <div class="p-settings-field">
+        <label class="p-settings-label">{{ form.current_pin.label.text }} <span class="p-required">*</span></label>
+        {{ form.current_pin(class="p-settings-input", placeholder="現在の4桁PIN") }}
+        {% for e in form.current_pin.errors %}<div class="p-field-error">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="p-settings-field">
+        <label class="p-settings-label">{{ form.new_pin.label.text }}</label>
+        {{ form.new_pin(class="p-settings-input", placeholder="新しい4桁PIN（変更しない場合は空欄）") }}
+        {% for e in form.new_pin.errors %}<div class="p-field-error">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="p-settings-field">
+        <label class="p-settings-label">{{ form.new_pin_confirm.label.text }}</label>
+        {{ form.new_pin_confirm(class="p-settings-input", placeholder="新しいPIN（確認）") }}
+        {% for e in form.new_pin_confirm.errors %}<div class="p-field-error">{{ e }}</div>{% endfor %}
+      </div>
+    </div>
+
+    <button type="submit" class="p-btn p-btn--primary p-btn--lg">保存する</button>
+  </form>
+</main>
+
+<nav class="p-bottom-nav">
+  <a href="{{ url_for('parent.home') }}" class="p-nav-item">
+    <span class="p-nav-item__icon">🏠</span>ホーム
+  </a>
+  <a href="{{ url_for('parent.input') }}" class="p-nav-item">
+    <span class="p-nav-item__icon">📝</span>記録する
+  </a>
+  <a href="{{ url_for('parent.settings') }}" class="p-nav-item p-nav-item--active">
+    <span class="p-nav-item__icon">⚙️</span>設定
+  </a>
+  <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="p-nav-item p-nav-item--btn">
+      <span class="p-nav-item__icon">🚪</span>ログアウト
+    </button>
+  </form>
+</nav>
+
+{% endblock %}

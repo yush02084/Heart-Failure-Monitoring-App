@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}設定 — 心不全見守り{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/watcher.css') }}">
+{% endblock %}
+
+{% block content %}
+<header class="w-header">
+  <div class="w-header__logo">🫀 心不全見守り</div>
+  <div class="w-header__actions">
+    <a href="{{ url_for('watcher.settings') }}" class="w-header__icon" aria-label="設定" title="設定" style="text-decoration:none;">⚙️</a>
+    <form method="POST" action="{{ url_for('auth.logout') }}" class="w-header__logout-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="w-header__logout">ログアウト</button>
+    </form>
+  </div>
+</header>
+
+<div class="w-container">
+  <h1 class="w-page-title">⚙️ アカウント設定</h1>
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <!-- 基本情報 -->
+    <div class="w-settings-section">
+      <div class="w-settings-section__title">基本情報</div>
+
+      <div class="reg-field">
+        <label>{{ form.name.label.text }} <span class="required">*</span></label>
+        {{ form.name(class="reg-input", placeholder="お名前") }}
+        {% for e in form.name.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="reg-field">
+        <label>{{ form.phone_number.label.text }}</label>
+        {{ form.phone_number(class="reg-input", placeholder="例: 090-1234-5678") }}
+        {% for e in form.phone_number.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+      </div>
+    </div>
+
+    <!-- パスワード変更 -->
+    <div class="w-settings-section">
+      <div class="w-settings-section__title">パスワード変更</div>
+
+      <div class="reg-field">
+        <label>{{ form.current_password.label.text }} <span class="required">*</span></label>
+        {{ form.current_password(class="reg-input", placeholder="現在のパスワード") }}
+        {% for e in form.current_password.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="reg-field">
+        <label>{{ form.new_password.label.text }}</label>
+        {{ form.new_password(class="reg-input", placeholder="8文字以上（変更しない場合は空欄）") }}
+        {% for e in form.new_password.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="reg-field">
+        <label>{{ form.new_password_confirm.label.text }}</label>
+        {{ form.new_password_confirm(class="reg-input", placeholder="新しいパスワード（確認）") }}
+        {% for e in form.new_password_confirm.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+      </div>
+    </div>
+
+    <button type="submit" class="reg-submit">保存する</button>
+  </form>
+
+  <!-- 見守り解除 -->
+  {% if relationships %}
+  <div class="w-settings-section w-settings-section--danger">
+    <div class="w-settings-section__title">見守り解除</div>
+    {% for rel in relationships %}
+    <div class="w-unwatch-row">
+      <span class="w-unwatch-name">{{ rel.parent.name }} さん</span>
+      <form method="POST" action="{{ url_for('watcher.unwatch', parent_id=rel.parent_user_id) }}">
+        {{ form.hidden_tag() }}
+        <button type="submit" class="w-btn-unwatch"
+                onclick="return confirm('{{ rel.parent.name }}さんの見守りを解除しますか？')">
+          解除
+        </button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+<nav class="w-bottom-nav">
+  <a href="{{ url_for('watcher.dashboard') }}" class="w-nav-item">
+    <span class="w-nav-item__icon">⊞</span>ダッシュボード
+  </a>
+  <a href="{{ url_for('watcher.join') }}" class="w-nav-item">
+    <span class="w-nav-item__icon">➕</span>家族を追加
+  </a>
+  <a href="{{ url_for('watcher.settings') }}" class="w-nav-item w-nav-item--active">
+    <span class="w-nav-item__icon">⚙️</span>設定
+  </a>
+</nav>
+
+{% endblock %}

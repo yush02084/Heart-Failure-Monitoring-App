@@ -110,6 +110,9 @@
   <a href="{{ url_for('parent.input') }}" class="p-nav-item p-nav-item--active">
     <span class="p-nav-item__icon">📝</span>記録する
   </a>
+  <a href="{{ url_for('parent.settings') }}" class="p-nav-item">
+    <span class="p-nav-item__icon">⚙️</span>設定
+  </a>
   <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <button type="submit" class="p-nav-item p-nav-item--btn">

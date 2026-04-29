@@ -621,3 +621,54 @@ a.w-add-card {
   outline: 3px solid var(--primary);
   outline-offset: 2px;
 }
+
+/* 設定画面 */
+.w-settings-section {
+  background: var(--surface);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.w-settings-section--danger {
+  border-color: var(--danger-light, #ffb4ac);
+}
+
+.w-settings-section__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--on-surface-muted);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.w-unwatch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--outline-variant);
+}
+
+.w-unwatch-row:last-child { border-bottom: none; }
+
+.w-unwatch-name {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.w-btn-unwatch {
+  background: transparent;
+  border: 1.5px solid var(--danger);
+  border-radius: var(--radius);
+  color: var(--danger);
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+.w-btn-unwatch:hover { background: #ffdad6; }
