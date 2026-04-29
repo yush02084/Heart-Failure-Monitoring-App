@@ -1,10 +1,10 @@
-from flask import render_template, abort, request, flash, redirect, url_for
+from flask import render_template, abort, request, flash, redirect, url_for, jsonify, current_app
 from flask_login import login_required, current_user
 from app.watcher import bp
 from app.watcher.services import get_dashboard_context, get_parent_detail_context
 from app.auth.forms import WatcherSettingsForm
 from app.extensions import db, bcrypt
-from app.models import Invitation, WatchRelationship
+from app.models import Invitation, WatchRelationship, PushSubscription
 from app.core.tz import now_jst
 
 
@@ -150,3 +150,56 @@ def notifications():
         or p["days_since_last_input"] >= 2
     ]
     return render_template("watcher/notifications.html", notifs=notifs, user=ctx["user"])
+
+
+@bp.route("/vapid-public-key")
+@login_required
+def vapid_public_key():
+    return jsonify({"publicKey": current_app.config["VAPID_PUBLIC_KEY"]})
+
+
+@bp.route("/push-subscribe", methods=["POST"])
+@login_required
+def push_subscribe():
+    if not current_user.is_watcher():
+        abort(403)
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "invalid"}), 400
+
+    endpoint = data.get("endpoint")
+    p256dh = data.get("keys", {}).get("p256dh")
+    auth = data.get("keys", {}).get("auth")
+    if not all([endpoint, p256dh, auth]):
+        return jsonify({"error": "missing fields"}), 400
+
+    existing = PushSubscription.query.filter_by(endpoint=endpoint).first()
+    if existing:
+        existing.user_id = current_user.id
+        existing.p256dh = p256dh
+        existing.auth = auth
+    else:
+        sub = PushSubscription(
+            user_id=current_user.id,
+            endpoint=endpoint,
+            p256dh=p256dh,
+            auth=auth,
+        )
+        db.session.add(sub)
+    db.session.commit()
+    return jsonify({"status": "ok"})
+
+
+@bp.route("/push-subscribe", methods=["DELETE"])
+@login_required
+def push_unsubscribe():
+    if not current_user.is_watcher():
+        abort(403)
+    data = request.get_json()
+    endpoint = data.get("endpoint") if data else None
+    if endpoint:
+        PushSubscription.query.filter_by(
+            user_id=current_user.id, endpoint=endpoint
+        ).delete()
+        db.session.commit()
+    return jsonify({"status": "ok"})

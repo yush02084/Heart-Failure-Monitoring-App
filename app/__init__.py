@@ -1,5 +1,5 @@
 from flask import Flask
-from app.extensions import db, login_manager, bcrypt, migrate, csrf
+from app.extensions import db, login_manager, bcrypt, migrate, csrf, scheduler
 from config import Config
 
 
@@ -13,6 +13,22 @@ def create_app(config_class=Config):
     bcrypt.init_app(app)
     migrate.init_app(app, db)
     csrf.init_app(app)
+
+    # APScheduler: 毎朝7時JSTに未記録チェック通知
+    if not scheduler.running:
+        app.config["SCHEDULER_API_ENABLED"] = False
+        scheduler.init_app(app)
+        from app.core.push_utils import check_and_notify_unrecorded
+        scheduler.add_job(
+            id="check_unrecorded",
+            func=check_and_notify_unrecorded,
+            trigger="cron",
+            hour=7,
+            minute=0,
+            timezone="Asia/Tokyo",
+            replace_existing=True,
+        )
+        scheduler.start()
 
     # Flask-Login ユーザーローダー
     from app.models.user import User

@@ -90,6 +90,18 @@ def input():
         try:
             db.session.commit()
             flash("記録を保存しました。", "success")
+            # アラートレベルが注意・警戒のときwatcherにpush通知
+            if alert_level >= 2:
+                try:
+                    from app.core.push_utils import notify_watchers_push
+                    from app.core.alert_logic import ALERT_LABEL
+                    notify_watchers_push(
+                        parent_user_id=current_user.id,
+                        title=f"⚠️ {current_user.name}さんに{ALERT_LABEL[alert_level]}サインが出ています",
+                        body="アプリで状態を確認してください",
+                    )
+                except Exception:
+                    pass  # push失敗しても記録保存は成功扱い
             return redirect(url_for("parent.home"))
         except Exception:
             db.session.rollback()
