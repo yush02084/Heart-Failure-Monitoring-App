@@ -39,6 +39,25 @@
   </a>
   {% endif %}
 
+  <!-- 子を招待する -->
+  <section class="p-section">
+    <h2 class="p-section-title">見守り登録</h2>
+    <div class="p-invite-card">
+      <p class="p-invite-desc">家族に見守ってもらうための招待リンクを発行します。</p>
+      <button type="button" class="p-btn p-btn--outline" id="invite-btn" onclick="generateInvite()">
+        🔗 招待リンクを発行する
+      </button>
+      <div id="invite-result" class="p-invite-result" style="display:none;">
+        <p class="p-invite-label">招待リンク（30分有効）</p>
+        <div class="p-invite-url-row">
+          <input type="text" id="invite-url" class="p-invite-url" readonly>
+          <button type="button" class="p-btn p-btn--outline p-btn--sm" onclick="copyInvite()">コピー</button>
+        </div>
+        <p id="copy-msg" class="p-invite-copy-msg" style="display:none;">コピーしました！</p>
+      </div>
+    </div>
+  </section>
+
   {% if recent_records %}
   <section class="p-section">
     <h2 class="p-section-title">過去7日の記録</h2>
@@ -86,5 +105,49 @@
     </button>
   </form>
 </nav>
+
+{% block extra_js %}
+<script>
+  const INVITE_URL = "{{ url_for('parent.invite') }}";
+  const CSRF_TOKEN = "{{ csrf_token() }}";
+
+  function generateInvite() {
+    const btn = document.getElementById('invite-btn');
+    btn.disabled = true;
+    btn.textContent = '発行中...';
+
+    fetch(INVITE_URL, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': CSRF_TOKEN, 'Content-Type': 'application/json' },
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.url) {
+        document.getElementById('invite-url').value = data.url;
+        document.getElementById('invite-result').style.display = 'block';
+      } else {
+        alert('招待リンクの発行に失敗しました。');
+      }
+      btn.disabled = false;
+      btn.textContent = '🔗 招待リンクを再発行する';
+    })
+    .catch(() => {
+      alert('通信エラーが発生しました。');
+      btn.disabled = false;
+      btn.textContent = '🔗 招待リンクを発行する';
+    });
+  }
+
+  function copyInvite() {
+    const url = document.getElementById('invite-url');
+    url.select();
+    navigator.clipboard.writeText(url.value).then(() => {
+      const msg = document.getElementById('copy-msg');
+      msg.style.display = 'block';
+      setTimeout(() => { msg.style.display = 'none'; }, 2000);
+    });
+  }
+</script>
+{% endblock %}
 
 {% endblock %}

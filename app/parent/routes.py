@@ -1,9 +1,11 @@
-from flask import render_template, redirect, url_for, flash, request
+import secrets
+from datetime import timedelta
+from flask import render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
 from app.parent import bp
 from app.parent.forms import DailyInputForm
 from app.extensions import db
-from app.models import DailyRecord
+from app.models import DailyRecord, Invitation
 from app.core.tz import now_jst, today_jst
 from app.core.alert_logic import calc_alert_level, ALERT_LOGIC_VERSION
 
@@ -103,3 +105,38 @@ def input():
         today_str=f"{today.year}年{today.month:02d}月{today.day:02d}日（{'月火水木金土日'[today.weekday()]}）",
         existing=existing is not None,
     )
+
+
+@bp.route("/invite", methods=["POST"])
+@login_required
+def invite():
+    if not current_user.is_parent():
+        return jsonify({"error": "forbidden"}), 403
+
+    # 未使用の有効なトークンがあれば再利用
+    existing = (
+        Invitation.query
+        .filter_by(parent_user_id=current_user.id)
+        .filter(Invitation.used_at.is_(None))
+        .filter(Invitation.expires_at > now_jst())
+        .first()
+    )
+    if existing:
+        invite_url = url_for("auth.register_watcher", token=existing.sharing_token, _external=True)
+        return jsonify({"url": invite_url})
+
+    token = secrets.token_urlsafe(32)
+    inv = Invitation(
+        parent_user_id=current_user.id,
+        sharing_token=token,
+        expires_at=now_jst() + timedelta(minutes=30),
+    )
+    db.session.add(inv)
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        return jsonify({"error": "生成に失敗しました"}), 500
+
+    invite_url = url_for("auth.register_watcher", token=token, _external=True)
+    return jsonify({"url": invite_url})
