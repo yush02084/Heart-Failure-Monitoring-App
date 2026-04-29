@@ -486,8 +486,22 @@ a { color: inherit; text-decoration: none; }
 /* ==============================
    レスポンシブ（タブレット〜PC）
    ============================== */
+.w-header__logout-form { display: none; }
+
 @media (min-width: 768px) {
   body { padding-bottom: 0; }
+  .w-header__logout-form { display: block; }
+  .w-header__logout {
+    background: transparent;
+    border: 1.5px solid var(--outline-variant);
+    border-radius: var(--radius);
+    padding: 6px 14px;
+    font-size: 14px;
+    color: var(--on-surface-muted);
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .w-header__logout:hover { background: var(--surface-low); }
 
   .w-container {
     max-width: 960px;

@@ -11,6 +11,10 @@
   <div class="w-header__actions">
     <button class="w-header__icon" aria-label="通知" title="通知">🔔</button>
     <button class="w-header__icon" aria-label="アカウント設定" title="アカウント">👤</button>
+    <form method="POST" action="{{ url_for('auth.logout') }}" class="w-header__logout-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="w-header__logout">ログアウト</button>
+    </form>
   </div>
 </header>
 
