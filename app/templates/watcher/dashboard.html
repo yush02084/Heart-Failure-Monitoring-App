@@ -68,7 +68,7 @@
       </div>
 
       <div class="w-card-actions {% if p.alert_level == 3 %}w-card-actions--emergency{% endif %}">
-        {% if p.alert_level >= 2 %}
+        {% if p.alert_level >= 2 or p.days_since_last_input is none or p.days_since_last_input >= 2 %}
         <a href="{{ p.tel_link }}" class="w-btn-call w-btn-call--danger w-btn-call--sm">
           📞 電話する
         </a>
