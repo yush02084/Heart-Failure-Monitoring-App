@@ -105,9 +105,7 @@
   <a href="{{ url_for('watcher.join') }}" class="w-nav-item">
     <span class="w-nav-item__icon">➕</span>家族を追加
   </a>
-  <a href="{{ url_for('watcher.notifications') }}" class="w-nav-item">
-    <span class="w-nav-item__icon">🔔</span>通知
-  </a>
+  <a href="{{ url_for('watcher.notifications') }}" class="w-nav-item"><span class="w-nav-icon-wrap"><span class="w-nav-item__icon">🔔</span>{% if unread_count > 0 %}<span class="w-badge-count w-badge-count--nav">{{ unread_count }}</span>{% endif %}</span>通知</a>
   <a href="{{ url_for('watcher.settings') }}" class="w-nav-item">
     <span class="w-nav-item__icon">⚙️</span>設定
   </a>
