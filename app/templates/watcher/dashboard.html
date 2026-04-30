@@ -120,14 +120,14 @@
   const perm = Notification.permission;
   if (perm === 'granted') return;
   if (perm === 'denied') return;
-  if (sessionStorage.getItem('push-dismissed')) return;
+  if (localStorage.getItem('push-dismissed')) return;
 
   const banner = document.getElementById('push-banner');
   banner.style.display = 'flex';
 
   document.getElementById('push-dismiss-btn').addEventListener('click', () => {
     banner.style.display = 'none';
-    sessionStorage.setItem('push-dismissed', '1');
+    localStorage.setItem('push-dismissed', '1');
   });
 
   document.getElementById('push-enable-btn').addEventListener('click', async () => {
