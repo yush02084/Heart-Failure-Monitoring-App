@@ -33,6 +33,20 @@
   --radius-full: 9999px;
 }
 
+/* --- フラッシュメッセージ --- */
+.flash {
+  display: block;
+  padding: 12px 16px;
+  margin: 12px 16px 0;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.flash-error   { background: #fef2f2; color: #b91c1c; border: 1px solid #fca5a5; }
+.flash-success { background: #f0fdf4; color: #15803d; border: 1px solid #86efac; }
+.flash-info    { background: #eff6ff; color: #1d4ed8; border: 1px solid #93c5fd; }
+
 /* --- ベースリセット --- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
