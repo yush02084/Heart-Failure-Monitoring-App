@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 def send_push(endpoint: str, p256dh: str, auth: str, title: str, body: str, url: str = "/watcher/dashboard"):
     """1件のサブスクリプションにプッシュ通知を送る"""
     try:
+        logger.info(f"[Push] 送信開始: {endpoint[:60]}...")
         webpush(
             subscription_info={
                 "endpoint": endpoint,
@@ -24,11 +25,13 @@ def send_push(endpoint: str, p256dh: str, auth: str, title: str, body: str, url:
             vapid_private_key=current_app.config["VAPID_PRIVATE_KEY"],
             vapid_claims=current_app.config["VAPID_CLAIMS"],
         )
+        logger.info("[Push] 送信成功")
     except WebPushException as e:
-        logger.warning(f"Push送信失敗: {e}")
-        # 410 Gone = サブスクリプション無効 → DBから削除
+        logger.error(f"[Push] 送信失敗: {e} / response: {e.response.text if e.response else 'none'}")
         if e.response and e.response.status_code == 410:
             return "gone"
+    except Exception as e:
+        logger.error(f"[Push] 予期しないエラー: {e}", exc_info=True)
     return "ok"
 
 

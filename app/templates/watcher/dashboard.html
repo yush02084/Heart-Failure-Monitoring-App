@@ -132,21 +132,30 @@
 
   document.getElementById('push-enable-btn').addEventListener('click', async () => {
     banner.style.display = 'none';
+    localStorage.setItem('push-dismissed', '1');  // 失敗してもバナーを再表示しない
     try {
       const res = await fetch('/watcher/vapid-public-key');
       const { publicKey } = await res.json();
+      console.log('[Push] VAPID公開鍵取得OK:', publicKey.slice(0, 20) + '...');
+
       const reg = await navigator.serviceWorker.ready;
+      console.log('[Push] ServiceWorker準備OK');
+
       const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(publicKey),
       });
-      await fetch('/watcher/push-subscribe', {
+      console.log('[Push] ブラウザ購読OK:', sub.endpoint.slice(0, 50) + '...');
+
+      const saveRes = await fetch('/watcher/push-subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' },
         body: JSON.stringify(sub.toJSON()),
       });
+      const saveData = await saveRes.json();
+      console.log('[Push] DB保存結果:', saveData);
     } catch (e) {
-      console.warn('Push登録失敗:', e);
+      console.error('[Push] 登録失敗:', e);
     }
   });
 
