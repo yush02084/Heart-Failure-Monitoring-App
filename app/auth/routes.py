@@ -67,6 +67,9 @@ def logout():
 
 @bp.route("/register/watcher/<token>", methods=["GET", "POST"])
 def register_watcher(token):
+    if current_user.is_authenticated:
+        return _redirect_by_role(current_user)
+
     invitation = Invitation.query.filter_by(sharing_token=token).first()
 
     if not invitation or not invitation.is_valid():

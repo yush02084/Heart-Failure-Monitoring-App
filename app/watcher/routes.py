@@ -1,7 +1,7 @@
 from flask import render_template, abort, request, flash, redirect, url_for, jsonify, current_app
 from flask_login import login_required, current_user
 from app.watcher import bp
-from app.watcher.services import get_dashboard_context, get_parent_detail_context
+from app.watcher.services import get_dashboard_context, get_parent_detail_context, get_unread_count
 from app.auth.forms import WatcherSettingsForm
 from app.extensions import db, bcrypt
 from app.models import Invitation, WatchRelationship, PushSubscription
@@ -25,8 +25,7 @@ def parent_detail(parent_id: int):
     ctx = get_parent_detail_context(current_user, parent_id)
     if ctx is None:
         abort(404)
-    dash = get_dashboard_context(current_user)
-    ctx["unread_count"] = dash["unread_count"]
+    ctx["unread_count"] = get_unread_count(current_user)
     return render_template("watcher/parent_detail.html", **ctx)
 
 
