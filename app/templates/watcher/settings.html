@@ -75,6 +75,14 @@
     <button type="submit" class="reg-submit">保存する</button>
   </form>
 
+  <!-- プッシュ通知設定 -->
+  <div class="w-settings-section">
+    <div class="w-settings-section__title">プッシュ通知</div>
+    <p id="push-status-text" style="font-size:14px;color:var(--text-muted);margin:0 0 12px;">確認中...</p>
+    <button id="push-toggle-btn" class="reg-submit" style="max-width:200px;" onclick="handlePushToggle()">通知を有効にする</button>
+    <p id="push-msg" style="font-size:13px;margin:8px 0 0;color:var(--primary);display:none;"></p>
+  </div>
+
   <!-- 見守り解除 -->
   {% if relationships %}
   <div class="w-settings-section w-settings-section--danger">
@@ -113,4 +121,98 @@
   </form>
 </nav>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function urlBase64ToUint8Array(b) {
+  const pad = '='.repeat((4 - b.length % 4) % 4);
+  const base64 = (b + pad).replace(/-/g, '+').replace(/_/g, '/');
+  return Uint8Array.from([...atob(base64)].map(c => c.charCodeAt(0)));
+}
+
+// 通知状態を表示
+(async () => {
+  const statusEl = document.getElementById('push-status-text');
+  const btn = document.getElementById('push-toggle-btn');
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+    statusEl.textContent = 'このブラウザはプッシュ通知に対応していません';
+    btn.style.display = 'none';
+    return;
+  }
+  const perm = Notification.permission;
+  if (perm === 'denied') {
+    statusEl.textContent = '❌ 通知がブロックされています。ブラウザの設定から許可してください。';
+    btn.style.display = 'none';
+  } else if (perm === 'granted') {
+    statusEl.textContent = '✅ 通知は有効です';
+    btn.textContent = '通知を再登録する';
+  } else {
+    statusEl.textContent = '🔕 通知は未設定です';
+    btn.textContent = '通知を有効にする';
+  }
+})();
+
+async function handlePushToggle() {
+  const btn = document.getElementById('push-toggle-btn');
+  const msgEl = document.getElementById('push-msg');
+  const statusEl = document.getElementById('push-status-text');
+  btn.disabled = true;
+  btn.textContent = '処理中...';
+  msgEl.style.display = 'none';
+
+  try {
+    // 既存の購読を解除（強制再登録のため）
+    const reg = await navigator.serviceWorker.ready;
+    const oldSub = await reg.pushManager.getSubscription();
+    if (oldSub) {
+      await fetch('/watcher/push-subscribe', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' },
+        body: JSON.stringify({ endpoint: oldSub.endpoint }),
+      });
+      await oldSub.unsubscribe();
+    }
+
+    // 通知許可を要求（未許可の場合）
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') {
+      msgEl.textContent = '通知の許可が得られませんでした';
+      msgEl.style.color = 'var(--danger, #e53e3e)';
+      msgEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = '通知を有効にする';
+      return;
+    }
+
+    // 新しいVAPID鍵で再登録
+    const res = await fetch('/watcher/vapid-public-key');
+    const { publicKey } = await res.json();
+    const newSub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey),
+    });
+    await fetch('/watcher/push-subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' },
+      body: JSON.stringify(newSub.toJSON()),
+    });
+
+    // localStorageのフラグをクリア
+    localStorage.removeItem('push-dismissed');
+
+    statusEl.textContent = '✅ 通知は有効です';
+    btn.textContent = '通知を再登録する';
+    msgEl.textContent = '✅ 通知を登録しました！';
+    msgEl.style.color = 'var(--primary)';
+    msgEl.style.display = 'block';
+  } catch (e) {
+    msgEl.textContent = '❌ エラーが発生しました: ' + e.message;
+    msgEl.style.color = 'var(--danger, #e53e3e)';
+    msgEl.style.display = 'block';
+    btn.textContent = '通知を有効にする';
+  }
+  btn.disabled = false;
+}
+</script>
 {% endblock %}
