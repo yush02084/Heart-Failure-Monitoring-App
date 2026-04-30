@@ -140,7 +140,7 @@
       console.log('[Push] VAPID公開鍵取得OK:', publicKey.slice(0, 20) + '...');
 
       // SW登録を自分でやってreadyを待つ（タイムアウト付き）
-      const swReg = await navigator.serviceWorker.register('/static/sw.js');
+      const swReg = await navigator.serviceWorker.register('/sw.js');
       console.log('[Push] SW登録:', swReg.scope);
       const reg = await Promise.race([
         navigator.serviceWorker.ready,

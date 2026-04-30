@@ -56,6 +56,14 @@ def create_app(config_class=Config):
         response.headers["X-Content-Type-Options"] = "nosniff"
         return response
 
+    @app.route("/sw.js")
+    def service_worker():
+        from flask import send_from_directory
+        response = send_from_directory("static", "sw.js")
+        response.headers["Service-Worker-Allowed"] = "/"
+        response.headers["Cache-Control"] = "no-cache"
+        return response
+
     @app.route("/")
     def index():
         if current_user.is_authenticated:
