@@ -139,7 +139,13 @@
       const { publicKey } = await res.json();
       console.log('[Push] VAPID公開鍵取得OK:', publicKey.slice(0, 20) + '...');
 
-      const reg = await navigator.serviceWorker.ready;
+      // SW登録を自分でやってreadyを待つ（タイムアウト付き）
+      const swReg = await navigator.serviceWorker.register('/static/sw.js');
+      console.log('[Push] SW登録:', swReg.scope);
+      const reg = await Promise.race([
+        navigator.serviceWorker.ready,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('ServiceWorker ready タイムアウト（5秒）')), 5000))
+      ]);
       console.log('[Push] ServiceWorker準備OK');
 
       const sub = await reg.pushManager.subscribe({
