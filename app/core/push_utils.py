@@ -12,17 +12,32 @@ from pywebpush import webpush, WebPushException
 logger = logging.getLogger(__name__)
 
 
+def _get_vapid():
+    """PEM文字列からVapidオブジェクトを生成"""
+    from py_vapid import Vapid
+    from cryptography.hazmat.primitives.serialization import load_pem_private_key
+    pem = current_app.config["VAPID_PRIVATE_KEY"]
+    if isinstance(pem, str):
+        pem = pem.encode("utf-8")
+    private_key = load_pem_private_key(pem, password=None)
+    v = Vapid()
+    v._private_key = private_key
+    v._public_key = private_key.public_key()
+    return v
+
+
 def send_push(endpoint: str, p256dh: str, auth: str, title: str, body: str, url: str = "/watcher/dashboard"):
     """1件のサブスクリプションにプッシュ通知を送る"""
     try:
         logger.info(f"[Push] 送信開始: {endpoint[:60]}...")
+        vapid = _get_vapid()
         webpush(
             subscription_info={
                 "endpoint": endpoint,
                 "keys": {"p256dh": p256dh, "auth": auth},
             },
             data=json.dumps({"title": title, "body": body, "url": url}),
-            vapid_private_key=current_app.config["VAPID_PRIVATE_KEY"],
+            vapid_private_key=vapid,
             vapid_claims=current_app.config["VAPID_CLAIMS"],
         )
         logger.info("[Push] 送信成功")
