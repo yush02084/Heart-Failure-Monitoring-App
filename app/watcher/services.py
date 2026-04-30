@@ -91,7 +91,8 @@ def get_dashboard_context(watcher: User) -> dict:
         else:
             latest_rec = latest_map.get(p["parent_id"])
             if latest_rec is None:
-                unread_count += 1
+                # 記録なし = 既に通知ページを見たことがあるなら既読扱い
+                pass
             else:
                 rec_time = latest_rec.updated_at
                 if rec_time and rec_time.tzinfo:
