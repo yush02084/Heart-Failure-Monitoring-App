@@ -25,6 +25,8 @@ def parent_detail(parent_id: int):
     ctx = get_parent_detail_context(current_user, parent_id)
     if ctx is None:
         abort(404)
+    dash = get_dashboard_context(current_user)
+    ctx["unread_count"] = dash["unread_count"]
     return render_template("watcher/parent_detail.html", **ctx)
 
 
