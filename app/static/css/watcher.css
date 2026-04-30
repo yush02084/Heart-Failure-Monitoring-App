@@ -708,10 +708,20 @@ a.w-add-card {
   border: 1.5px solid #fff;
 }
 
+.w-nav-icon-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 .w-badge-count--nav {
-  position: static;
-  margin-left: 4px;
-  font-size: 10px;
+  position: absolute;
+  top: -2px;
+  right: -6px;
+  margin-left: 0;
+  font-size: 9px;
+  min-width: 14px;
+  height: 14px;
 }
 
 /* --- 通知ページ --- */
