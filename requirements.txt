@@ -4,3 +4,6 @@ flask-login==0.6.3
 flask-bcrypt==1.0.1
 flask-wtf==1.2.1
 flask-migrate==4.0.7
+gunicorn==22.0.0
+pywebpush==2.0.0
+flask-apscheduler==1.13.1

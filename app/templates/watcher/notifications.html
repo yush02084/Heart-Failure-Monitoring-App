@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}通知 — MiMo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/watcher.css') }}">
+{% endblock %}
+
+{% block content %}
+<header class="w-header">
+  <div class="w-header__logo"><img src="/static/icons/icon-192.png" alt="MiMo" class="header-logo-img"></div>
+  <div class="w-header__actions">
+    <a href="{{ url_for('watcher.settings') }}" class="w-header__icon" aria-label="アカウント設定" title="アカウント設定" style="text-decoration:none;">👤</a>
+    <a href="{{ url_for('watcher.dashboard') }}" class="w-header__icon" aria-label="ダッシュボードへ戻る" title="ダッシュボードへ戻る" style="text-decoration:none;font-size:14px;">← 一覧</a>
+  </div>
+</header>
+
+<main class="w-container">
+  <h1 class="w-page-title">🔔 通知</h1>
+
+  {% if notifs %}
+  <div class="w-notif-list">
+    {% for p in notifs %}
+    <div class="w-notif-card w-notif-card--alert-{{ p.alert_level }}">
+      <div class="w-notif-card__header">
+        <span class="w-notif-card__name">{{ p.parent_name }} さん</span>
+        <span class="w-badge w-badge--alert-{{ p.alert_level }}">{{ p.alert_emoji }} {{ p.alert_label }}</span>
+      </div>
+
+      <div class="w-notif-card__body">
+        {% if p.days_since_last_input is none %}
+          <p class="w-notif-card__msg">📭 まだ記録がありません</p>
+        {% elif p.days_since_last_input >= 2 %}
+          <p class="w-notif-card__msg">📅 最終記録から <strong>{{ p.days_since_last_input }}日</strong> 経過しています</p>
+        {% endif %}
+        {% if p.alert_level >= 2 %}
+          <p class="w-notif-card__msg">⚠️ 健康状態に変化があります。確認してください</p>
+        {% endif %}
+        <p class="w-notif-card__date">最終記録：{{ p.last_input_date_str }}</p>
+      </div>
+
+      <div class="w-notif-card__actions">
+        {% if p.alert_level >= 2 %}
+        <a href="{{ p.tel_link }}" class="w-btn-call w-btn-call--danger w-btn-call--sm">📞 電話する</a>
+        {% endif %}
+        <a href="{{ url_for('watcher.parent_detail', parent_id=p.parent_id) }}" class="w-btn-call w-btn-call--outline w-btn-call--sm">📋 詳細を見る</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="w-empty-state" style="margin-top: 40px;">
+    <div style="font-size: 48px; margin-bottom: 12px;">✅</div>
+    <p>現在、通知はありません</p>
+    <p style="color: var(--on-surface-muted); font-size: 14px; margin-top: 8px;">全員の状態は良好です</p>
+  </div>
+  {% endif %}
+</main>
+
+<nav class="w-bottom-nav">
+  <a href="{{ url_for('watcher.dashboard') }}" class="w-nav-item">
+    <span class="w-nav-item__icon">⊞</span>ダッシュボード
+  </a>
+  <a href="{{ url_for('watcher.join') }}" class="w-nav-item">
+    <span class="w-nav-item__icon">➕</span>家族を追加
+  </a>
+  <a href="{{ url_for('watcher.settings') }}" class="w-nav-item">
+    <span class="w-nav-item__icon">⚙️</span>設定
+  </a>
+</nav>
+{% endblock %}

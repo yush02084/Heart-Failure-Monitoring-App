@@ -20,3 +20,7 @@ class Config:
     TIMEZONE = "Asia/Tokyo"
     LOGIN_MAX_ATTEMPTS = 5        # この回数失敗で短期ロック
     LOGIN_LOCK_MINUTES = 15       # 短期ロック時間（分）
+    # 本番では必ず環境変数で指定すること。未設定の場合はプッシュ通知機能が無効になる
+    VAPID_PUBLIC_KEY = os.getenv("VAPID_PUBLIC_KEY")
+    VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY")
+    VAPID_CLAIMS = {"sub": f"mailto:{os.getenv('VAPID_CONTACT_EMAIL', 'admin@example.com')}"}

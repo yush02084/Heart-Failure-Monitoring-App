@@ -4,7 +4,8 @@ from flask import render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
 from app.parent import bp
 from app.parent.forms import DailyInputForm
-from app.extensions import db
+from app.auth.forms import ParentSettingsForm
+from app.extensions import db, bcrypt
 from app.models import DailyRecord, Invitation
 from app.core.tz import now_jst, today_jst
 from app.core.alert_logic import calc_alert_level, ALERT_LOGIC_VERSION
@@ -89,6 +90,18 @@ def input():
         try:
             db.session.commit()
             flash("記録を保存しました。", "success")
+            # アラートレベルが注意・警戒のときwatcherにpush通知
+            if alert_level >= 2:
+                try:
+                    from app.core.push_utils import notify_watchers_push
+                    from app.core.alert_logic import ALERT_LABEL
+                    notify_watchers_push(
+                        parent_user_id=current_user.id,
+                        title=f"⚠️ {current_user.name}さんに{ALERT_LABEL[alert_level]}サインが出ています",
+                        body="アプリで状態を確認してください",
+                    )
+                except Exception:
+                    pass  # push失敗しても記録保存は成功扱い
             return redirect(url_for("parent.home"))
         except Exception:
             db.session.rollback()
@@ -105,6 +118,48 @@ def input():
         today_str=f"{today.year}年{today.month:02d}月{today.day:02d}日（{'月火水木金土日'[today.weekday()]}）",
         existing=existing is not None,
     )
+
+
+@bp.route("/settings", methods=["GET", "POST"])
+@login_required
+def settings():
+    if not current_user.is_parent():
+        return redirect(url_for("watcher.dashboard"))
+
+    form = ParentSettingsForm(obj=current_user)
+    if form.validate_on_submit():
+        if not bcrypt.check_password_hash(current_user.pin_hash, form.current_pin.data):
+            flash("現在のPINが正しくありません。", "error")
+            return render_template("parent/settings.html", form=form)
+
+        if form.new_login_id.data:
+            from app.models.user import User as _User
+            dup = _User.query.filter_by(login_id=form.new_login_id.data)\
+                             .filter(_User.deleted_at.is_(None))\
+                             .filter(_User.id != current_user.id).first()
+            if dup:
+                flash("このログインIDはすでに使われています。", "error")
+                return render_template("parent/settings.html", form=form)
+            current_user.login_id = form.new_login_id.data
+
+        current_user.name = form.name.data
+        current_user.phone_number = form.phone_number.data or None
+        current_user.base_weight = float(form.base_weight.data)
+        current_user.base_weight_updated_at = now_jst()
+        current_user.updated_at = now_jst()
+
+        if form.new_pin.data:
+            current_user.pin_hash = bcrypt.generate_password_hash(form.new_pin.data).decode("utf-8")
+
+        try:
+            db.session.commit()
+            flash("設定を保存しました。", "success")
+            return redirect(url_for("parent.settings"))
+        except Exception:
+            db.session.rollback()
+            flash("保存に失敗しました。しばらく後にお試しください。", "error")
+
+    return render_template("parent/settings.html", form=form)
 
 
 @bp.route("/invite", methods=["POST"])

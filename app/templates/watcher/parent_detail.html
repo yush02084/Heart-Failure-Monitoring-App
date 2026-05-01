@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ parent.name }} — 心不全見守り{% endblock %}
+{% block title %}{{ parent.name }} — MiMo{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/watcher.css') }}">
@@ -7,10 +7,11 @@
 
 {% block content %}
 <header class="w-header">
-  <div class="w-header__logo">🫀 心不全見守り</div>
+  <div class="w-header__logo"><img src="/static/icons/icon-192.png" alt="MiMo" class="header-logo-img"></div>
   <div class="w-header__actions">
-    <button class="w-header__icon" aria-label="通知" title="通知">🔔</button>
-    <a href="{{ url_for('watcher.dashboard') }}" class="w-header__icon" aria-label="一覧に戻る" title="一覧に戻る">← 一覧</a>
+    <a href="{{ url_for('watcher.notifications') }}" class="w-header__icon w-header__notif" aria-label="通知" title="通知" style="text-decoration:none;">🔔{% if unread_count > 0 %}<span class="w-badge-count">{{ unread_count }}</span>{% endif %}</a>
+    <a href="{{ url_for('watcher.settings') }}" class="w-header__icon" aria-label="アカウント設定" title="アカウント設定" style="text-decoration:none;">👤</a>
+    <a href="{{ url_for('watcher.dashboard') }}" class="w-header__icon" aria-label="一覧に戻る" title="一覧に戻る" style="text-decoration:none;font-size:14px;">← 一覧</a>
   </div>
 </header>
 
@@ -101,13 +102,12 @@
   <a href="{{ url_for('watcher.dashboard') }}" class="w-nav-item">
     <span class="w-nav-item__icon">⊞</span>ダッシュボード
   </a>
-  <a href="#" class="w-nav-item w-nav-item--active"><span class="w-nav-item__icon">📊</span>生体データ</a>
-  <a href="#" class="w-nav-item"><span class="w-nav-item__icon">🔔</span>通知</a>
-  <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="submit" class="w-nav-item w-nav-item--btn">
-      <span class="w-nav-item__icon">🚪</span>ログアウト
-    </button>
-  </form>
+  <a href="{{ url_for('watcher.join') }}" class="w-nav-item">
+    <span class="w-nav-item__icon">➕</span>家族を追加
+  </a>
+  <a href="{{ url_for('watcher.notifications') }}" class="w-nav-item"><span class="w-nav-icon-wrap"><span class="w-nav-item__icon">🔔</span>{% if unread_count > 0 %}<span class="w-badge-count w-badge-count--nav">{{ unread_count }}</span>{% endif %}</span>通知</a>
+  <a href="{{ url_for('watcher.settings') }}" class="w-nav-item">
+    <span class="w-nav-item__icon">⚙️</span>設定
+  </a>
 </nav>
 {% endblock %}

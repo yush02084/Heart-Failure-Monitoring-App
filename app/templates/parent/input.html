@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}体重・息切れを記録 — 心不全見守り{% endblock %}
+{% block title %}体重・息切れを記録 — MiMo{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/parent.css') }}">
@@ -7,12 +7,15 @@
 
 {% block content %}
 <header class="p-header">
-  <div class="p-header__logo">🫀 心不全見守り</div>
+  <div class="p-header__logo"><img src="/static/icons/icon-192.png" alt="MiMo" class="header-logo-img"></div>
   <a href="{{ url_for('parent.home') }}" class="p-header__back">← 戻る</a>
-  <form method="POST" action="{{ url_for('auth.logout') }}" class="p-header__logout-form">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="submit" class="p-header__logout">ログアウト</button>
-  </form>
+  <div class="p-header__logout-form" style="display:flex;gap:8px;align-items:center;">
+    <a href="{{ url_for('parent.settings') }}" class="p-header__logout">⚙️ 設定</a>
+    <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="p-header__logout">ログアウト</button>
+    </form>
+  </div>
 </header>
 
 <main class="p-container">
@@ -109,6 +112,9 @@
   </a>
   <a href="{{ url_for('parent.input') }}" class="p-nav-item p-nav-item--active">
     <span class="p-nav-item__icon">📝</span>記録する
+  </a>
+  <a href="{{ url_for('parent.settings') }}" class="p-nav-item">
+    <span class="p-nav-item__icon">⚙️</span>設定
   </a>
   <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}家族を追加 — 心不全見守り{% endblock %}
+{% block title %}家族を追加 — MiMo{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/watcher.css') }}">
@@ -7,9 +7,12 @@
 
 {% block content %}
 <header class="w-header">
-  <a href="{{ url_for('watcher.dashboard') }}" class="w-header__back">← 戻る</a>
-  <div class="w-header__logo">🫀 心不全見守り</div>
-  <div></div>
+  <div class="w-header__logo"><img src="/static/icons/icon-192.png" alt="MiMo" class="header-logo-img"></div>
+  <div class="w-header__actions">
+    <a href="{{ url_for('watcher.notifications') }}" class="w-header__icon" aria-label="通知" title="通知" style="text-decoration:none;">🔔</a>
+    <a href="{{ url_for('watcher.settings') }}" class="w-header__icon" aria-label="アカウント設定" title="アカウント設定" style="text-decoration:none;">👤</a>
+    <a href="{{ url_for('watcher.dashboard') }}" class="w-header__icon" aria-label="ダッシュボードへ戻る" title="ダッシュボードへ戻る" style="text-decoration:none;font-size:14px;">← 一覧</a>
+  </div>
 </header>
 
 <main class="w-container">

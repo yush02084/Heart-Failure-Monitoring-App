@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+{% block title %}設定 — MiMo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/watcher.css') }}">
+{% endblock %}
+
+{% block content %}
+<header class="w-header">
+  <div class="w-header__logo"><img src="/static/icons/icon-192.png" alt="MiMo" class="header-logo-img"></div>
+  <div class="w-header__actions">
+    <a href="{{ url_for('watcher.notifications') }}" class="w-header__icon" aria-label="通知" title="通知" style="text-decoration:none;">🔔</a>
+    <a href="{{ url_for('watcher.dashboard') }}" class="w-header__icon" aria-label="ダッシュボードへ戻る" title="ダッシュボードへ戻る" style="text-decoration:none;font-size:14px;">← 一覧</a>
+  </div>
+</header>
+
+<div class="w-container">
+  <h1 class="w-page-title">⚙️ アカウント設定</h1>
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <!-- 基本情報 -->
+    <div class="w-settings-section">
+      <div class="w-settings-section__title">基本情報</div>
+
+      <div class="reg-field">
+        <label>{{ form.name.label.text }} <span class="required">*</span></label>
+        {{ form.name(class="reg-input", placeholder="お名前") }}
+        {% for e in form.name.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="reg-field">
+        <label>{{ form.phone_number.label.text }}</label>
+        {{ form.phone_number(class="reg-input", placeholder="例: 090-1234-5678") }}
+        {% for e in form.phone_number.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="reg-field">
+        <label>{{ form.email.label.text }}</label>
+        {{ form.email(class="reg-input", placeholder="例: taro@example.com", type="email") }}
+        {% for e in form.email.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="reg-field">
+        <label>{{ form.new_login_id.label.text }}</label>
+        {{ form.new_login_id(class="reg-input", placeholder="新しいログインID（変更しない場合は空欄）") }}
+        {% for e in form.new_login_id.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+      </div>
+    </div>
+
+    <!-- パスワード変更 -->
+    <div class="w-settings-section">
+      <div class="w-settings-section__title">パスワード変更</div>
+
+      <div class="reg-field">
+        <label>{{ form.current_password.label.text }} <span class="required">*</span></label>
+        {{ form.current_password(class="reg-input", placeholder="現在のパスワード") }}
+        {% for e in form.current_password.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="reg-field">
+        <label>{{ form.new_password.label.text }}</label>
+        {{ form.new_password(class="reg-input", placeholder="8文字以上（変更しない場合は空欄）") }}
+        {% for e in form.new_password.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="reg-field">
+        <label>{{ form.new_password_confirm.label.text }}</label>
+        {{ form.new_password_confirm(class="reg-input", placeholder="新しいパスワード（確認）") }}
+        {% for e in form.new_password_confirm.errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+      </div>
+    </div>
+
+    <button type="submit" class="reg-submit">保存する</button>
+  </form>
+
+  <!-- プッシュ通知設定 -->
+  <div class="w-settings-section">
+    <div class="w-settings-section__title">プッシュ通知</div>
+    <p id="push-status-text" style="font-size:14px;color:var(--text-muted);margin:0 0 12px;">確認中...</p>
+    <button id="push-toggle-btn" class="reg-submit" style="max-width:200px;" onclick="handlePushToggle()">通知を有効にする</button>
+    <p id="push-msg" style="font-size:13px;margin:8px 0 0;color:var(--primary);display:none;"></p>
+  </div>
+
+  <!-- 見守り解除 -->
+  {% if relationships %}
+  <div class="w-settings-section w-settings-section--danger">
+    <div class="w-settings-section__title">見守り解除</div>
+    {% for rel in relationships %}
+    <div class="w-unwatch-row">
+      <span class="w-unwatch-name">{{ rel.parent.name }} さん</span>
+      <form method="POST" action="{{ url_for('watcher.unwatch', parent_id=rel.parent_user_id) }}">
+        {{ form.hidden_tag() }}
+        <button type="submit" class="w-btn-unwatch"
+                onclick="return confirm('{{ rel.parent.name }}さんの見守りを解除しますか？')">
+          解除
+        </button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+<nav class="w-bottom-nav">
+  <a href="{{ url_for('watcher.dashboard') }}" class="w-nav-item">
+    <span class="w-nav-item__icon">⊞</span>ダッシュボード
+  </a>
+  <a href="{{ url_for('watcher.join') }}" class="w-nav-item">
+    <span class="w-nav-item__icon">➕</span>家族を追加
+  </a>
+  <a href="{{ url_for('watcher.settings') }}" class="w-nav-item w-nav-item--active">
+    <span class="w-nav-item__icon">⚙️</span>設定
+  </a>
+  <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="w-nav-item w-nav-item--btn">
+      <span class="w-nav-item__icon">🚪</span>ログアウト
+    </button>
+  </form>
+</nav>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function urlBase64ToUint8Array(b) {
+  const pad = '='.repeat((4 - b.length % 4) % 4);
+  const base64 = (b + pad).replace(/-/g, '+').replace(/_/g, '/');
+  return Uint8Array.from([...atob(base64)].map(c => c.charCodeAt(0)));
+}
+
+// 通知状態を表示
+(async () => {
+  const statusEl = document.getElementById('push-status-text');
+  const btn = document.getElementById('push-toggle-btn');
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+    statusEl.textContent = 'このブラウザはプッシュ通知に対応していません';
+    btn.style.display = 'none';
+    return;
+  }
+  const perm = Notification.permission;
+  if (perm === 'denied') {
+    statusEl.textContent = '❌ 通知がブロックされています。ブラウザの設定から許可してください。';
+    btn.style.display = 'none';
+  } else if (perm === 'granted') {
+    statusEl.textContent = '✅ 通知は有効です';
+    btn.textContent = '通知を再登録する';
+  } else {
+    statusEl.textContent = '🔕 通知は未設定です';
+    btn.textContent = '通知を有効にする';
+  }
+})();
+
+async function handlePushToggle() {
+  const btn = document.getElementById('push-toggle-btn');
+  const msgEl = document.getElementById('push-msg');
+  const statusEl = document.getElementById('push-status-text');
+  btn.disabled = true;
+  btn.textContent = '処理中...';
+  msgEl.style.display = 'none';
+
+  try {
+    // 既存の購読を解除（強制再登録のため）
+    const reg = await navigator.serviceWorker.ready;
+    const oldSub = await reg.pushManager.getSubscription();
+    if (oldSub) {
+      await fetch('/watcher/push-subscribe', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' },
+        body: JSON.stringify({ endpoint: oldSub.endpoint }),
+      });
+      await oldSub.unsubscribe();
+    }
+
+    // 通知許可を要求（未許可の場合）
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') {
+      msgEl.textContent = '通知の許可が得られませんでした';
+      msgEl.style.color = 'var(--danger, #e53e3e)';
+      msgEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = '通知を有効にする';
+      return;
+    }
+
+    // 新しいVAPID鍵で再登録
+    const res = await fetch('/watcher/vapid-public-key');
+    const { publicKey } = await res.json();
+    const newSub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey),
+    });
+    await fetch('/watcher/push-subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' },
+      body: JSON.stringify(newSub.toJSON()),
+    });
+
+    // localStorageのフラグをクリア
+    localStorage.removeItem('push-dismissed');
+
+    statusEl.textContent = '✅ 通知は有効です';
+    btn.textContent = '通知を再登録する';
+    msgEl.textContent = '✅ 通知を登録しました！';
+    msgEl.style.color = 'var(--primary)';
+    msgEl.style.display = 'block';
+  } catch (e) {
+    msgEl.textContent = '❌ エラーが発生しました: ' + e.message;
+    msgEl.style.color = 'var(--danger, #e53e3e)';
+    msgEl.style.display = 'block';
+    btn.textContent = '通知を有効にする';
+  }
+  btn.disabled = false;
+}
+</script>
+{% endblock %}

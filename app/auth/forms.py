@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, HiddenField, DecimalField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, Optional, NumberRange
+from wtforms.validators import DataRequired, Length, EqualTo, Optional, NumberRange
 
 
 class LoginForm(FlaskForm):
@@ -16,7 +16,6 @@ class RegisterWatcherForm(FlaskForm):
         validators=[DataRequired(), EqualTo("password", message="パスワードが一致しません")]
     )
     name = StringField("お名前", validators=[DataRequired(), Length(1, 20)])
-    email = StringField("メールアドレス", validators=[DataRequired(), Email()])
     phone_number = StringField("電話番号", validators=[Optional(), Length(max=20)])
     token = HiddenField()
 
@@ -35,3 +34,32 @@ class RegisterParentForm(FlaskForm):
                        DataRequired(message="基準体重を入力してください"),
                        NumberRange(min=20.0, max=300.0, message="20〜300kgの範囲で入力してください")
                    ])
+
+
+class ParentSettingsForm(FlaskForm):
+    name            = StringField("お名前", validators=[DataRequired(), Length(1, 20)])
+    phone_number    = StringField("電話番号", validators=[Optional(), Length(max=20)])
+    new_login_id    = StringField("新しいログインID（変更する場合）",
+                          validators=[Optional(), Length(4, 20)])
+    base_weight     = DecimalField("基準体重（kg）", places=1, validators=[
+                          DataRequired(message="基準体重を入力してください"),
+                          NumberRange(min=20.0, max=300.0, message="20〜300kgの範囲で入力してください")
+                      ])
+    current_pin     = PasswordField("現在のPIN", validators=[DataRequired()])
+    new_pin         = PasswordField("新しいPIN（変更する場合）",
+                          validators=[Optional(), Length(4, 4, message="PINは4桁で入力してください")])
+    new_pin_confirm = PasswordField("新しいPIN（確認）",
+                          validators=[Optional(), EqualTo("new_pin", message="PINが一致しません")])
+
+
+class WatcherSettingsForm(FlaskForm):
+    name                 = StringField("お名前", validators=[DataRequired(), Length(1, 20)])
+    phone_number         = StringField("電話番号", validators=[Optional(), Length(max=20)])
+    email                = StringField("メールアドレス", validators=[Optional(), Length(max=120)])
+    new_login_id         = StringField("新しいログインID（変更する場合）",
+                               validators=[Optional(), Length(4, 20)])
+    current_password     = PasswordField("現在のパスワード", validators=[DataRequired()])
+    new_password         = PasswordField("新しいパスワード（変更する場合）",
+                               validators=[Optional(), Length(8)])
+    new_password_confirm = PasswordField("新しいパスワード（確認）",
+                               validators=[Optional(), EqualTo("new_password", message="パスワードが一致しません")])

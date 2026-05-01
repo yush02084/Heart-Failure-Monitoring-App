@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}ダッシュボード — 心不全見守り{% endblock %}
+{% block title %}ダッシュボード — MiMo{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/watcher.css') }}">
@@ -7,10 +7,14 @@
 
 {% block content %}
 <header class="w-header">
-  <div class="w-header__logo">🫀 心不全見守り</div>
+  <div class="w-header__logo"><img src="/static/icons/icon-192.png" alt="MiMo" class="header-logo-img"></div>
   <div class="w-header__actions">
-    <button class="w-header__icon" aria-label="通知" title="通知">🔔</button>
-    <button class="w-header__icon" aria-label="アカウント設定" title="アカウント">👤</button>
+    <a href="{{ url_for('watcher.notifications') }}" class="w-header__icon w-header__notif" aria-label="通知" title="通知" style="text-decoration:none;">🔔{% if unread_count > 0 %}<span class="w-badge-count">{{ unread_count }}</span>{% endif %}</a>
+    <a href="{{ url_for('watcher.settings') }}" class="w-header__icon" aria-label="アカウント設定" title="アカウント設定" style="text-decoration:none;">👤</a>
+    <form method="POST" action="{{ url_for('auth.logout') }}" class="w-header__logout-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="w-header__logout">ログアウト</button>
+    </form>
   </div>
 </header>
 
@@ -64,7 +68,7 @@
       </div>
 
       <div class="w-card-actions {% if p.alert_level == 3 %}w-card-actions--emergency{% endif %}">
-        {% if p.alert_level >= 2 %}
+        {% if p.alert_level >= 2 or p.days_since_last_input is none or p.days_since_last_input >= 2 %}
         <a href="{{ p.tel_link }}" class="w-btn-call w-btn-call--danger w-btn-call--sm">
           📞 電話する
         </a>
@@ -78,26 +82,98 @@
     {% else %}
     <p class="w-empty-state">見守り対象はまだいません。</p>
     {% endfor %}
-  </div>
 
-  <a href="{{ url_for('watcher.join') }}" class="w-add-card" aria-label="その他の家族を追加">
-    <div class="w-add-card__icon">👥</div>
-    <div class="w-add-card__label">その他の家族を追加</div>
-    <div class="w-add-card__sub">招待リンクで見守り対象者を追加します</div>
-  </a>
+    <a href="{{ url_for('watcher.join') }}" class="w-add-card" aria-label="その他の家族を追加">
+      <div class="w-add-card__icon">👥</div>
+      <div class="w-add-card__label">その他の家族を追加</div>
+      <div class="w-add-card__sub">招待リンクで見守り対象者を追加します</div>
+    </a>
+  </div>
 </main>
+
+<!-- プッシュ通知バナー -->
+<div id="push-banner" style="display:none; position:fixed; bottom:80px; left:0; right:0; margin:0 16px; background:var(--primary); color:#fff; border-radius:12px; padding:14px 16px; align-items:center; justify-content:space-between; gap:12px; z-index:200; box-shadow:0 4px 16px rgba(0,98,105,0.3);">
+  <span style="font-size:14px;">🔔 アラートをプッシュ通知で受け取る</span>
+  <div style="display:flex;gap:8px;flex-shrink:0;">
+    <button id="push-enable-btn" style="background:#fff;color:var(--primary);border:none;border-radius:8px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer;">有効にする</button>
+    <button id="push-dismiss-btn" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.5);border-radius:8px;padding:8px 10px;font-size:13px;cursor:pointer;">後で</button>
+  </div>
+</div>
 
 <nav class="w-bottom-nav">
   <a href="{{ url_for('watcher.dashboard') }}" class="w-nav-item w-nav-item--active">
     <span class="w-nav-item__icon">⊞</span>ダッシュボード
   </a>
-  <a href="#" class="w-nav-item"><span class="w-nav-item__icon">📊</span>生体データ</a>
-  <a href="#" class="w-nav-item"><span class="w-nav-item__icon">🔔</span>通知</a>
-  <form method="POST" action="{{ url_for('auth.logout') }}" style="margin:0;">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="submit" class="w-nav-item w-nav-item--btn">
-      <span class="w-nav-item__icon">🚪</span>ログアウト
-    </button>
-  </form>
+  <a href="{{ url_for('watcher.join') }}" class="w-nav-item">
+    <span class="w-nav-item__icon">➕</span>家族を追加
+  </a>
+  <a href="{{ url_for('watcher.notifications') }}" class="w-nav-item"><span class="w-nav-icon-wrap"><span class="w-nav-item__icon">🔔</span>{% if unread_count > 0 %}<span class="w-badge-count w-badge-count--nav">{{ unread_count }}</span>{% endif %}</span>通知</a>
+  <a href="{{ url_for('watcher.settings') }}" class="w-nav-item">
+    <span class="w-nav-item__icon">⚙️</span>設定
+  </a>
 </nav>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function urlBase64ToUint8Array(b) {
+  const pad = '='.repeat((4 - b.length % 4) % 4);
+  const base64 = (b + pad).replace(/-/g, '+').replace(/_/g, '/');
+  return Uint8Array.from([...atob(base64)].map(c => c.charCodeAt(0)));
+}
+
+async function doSubscribe() {
+  const res = await fetch('/watcher/vapid-public-key');
+  const { publicKey } = await res.json();
+  console.log('[Push] VAPID取得OK');
+  const swReg = await navigator.serviceWorker.register('/sw.js');
+  console.log('[Push] SW登録:', swReg.scope);
+  const reg = await navigator.serviceWorker.ready;
+  console.log('[Push] SW準備OK');
+  // 既存の購読があれば再利用
+  let sub = await reg.pushManager.getSubscription();
+  if (!sub) {
+    sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey),
+    });
+  }
+  console.log('[Push] 購読OK:', sub.endpoint.slice(0, 60) + '...');
+  const saveRes = await fetch('/watcher/push-subscribe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' },
+    body: JSON.stringify(sub.toJSON()),
+  });
+  const saveData = await saveRes.json();
+  console.log('[Push] DB保存:', saveData);
+}
+
+(async () => {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  const perm = Notification.permission;
+  if (perm === 'denied') return;
+
+  // 許可済みなら自動で購読を試みる（バナー不要）
+  if (perm === 'granted') {
+    try { await doSubscribe(); } catch(e) { console.error('[Push] 自動登録失敗:', e); }
+    return;
+  }
+
+  // 未決定でかつ「後で」を押してない場合のみバナー表示
+  if (localStorage.getItem('push-dismissed')) return;
+  const banner = document.getElementById('push-banner');
+  banner.style.display = 'flex';
+
+  document.getElementById('push-dismiss-btn').addEventListener('click', () => {
+    banner.style.display = 'none';
+    localStorage.setItem('push-dismissed', '1');
+  });
+
+  document.getElementById('push-enable-btn').addEventListener('click', async () => {
+    banner.style.display = 'none';
+    localStorage.setItem('push-dismissed', '1');
+    try { await doSubscribe(); } catch(e) { console.error('[Push] 登録失敗:', e); }
+  });
+})();
+</script>
 {% endblock %}

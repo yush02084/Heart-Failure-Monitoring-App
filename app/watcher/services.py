@@ -74,7 +74,34 @@ def get_dashboard_context(watcher: User) -> dict:
 
     # 警戒→注意→通常の順でソート
     watched_parents.sort(key=lambda x: x["alert_level"], reverse=True)
-    return {"user": _user_dict(watcher), "watched_parents": watched_parents}
+
+    # 通知バッジ数（通知を最後に見た時刻より後に更新されたアラートのみカウント）
+    viewed_at = watcher.notifications_viewed_at
+    unread_count = 0
+    for p in watched_parents:
+        has_alert = (
+            p["alert_level"] >= 2
+            or p["days_since_last_input"] is None
+            or (p["days_since_last_input"] is not None and p["days_since_last_input"] >= 2)
+        )
+        if not has_alert:
+            continue
+        if viewed_at is None:
+            unread_count += 1
+        else:
+            latest_rec = latest_map.get(p["parent_id"])
+            if latest_rec is None:
+                # 記録なし = 既に通知ページを見たことがあるなら既読扱い
+                pass
+            else:
+                rec_time = latest_rec.updated_at
+                if rec_time and rec_time.tzinfo:
+                    rec_time = rec_time.replace(tzinfo=None)
+                vt = viewed_at.replace(tzinfo=None) if viewed_at.tzinfo else viewed_at
+                if rec_time > vt:
+                    unread_count += 1
+
+    return {"user": _user_dict(watcher), "watched_parents": watched_parents, "unread_count": unread_count}
 
 
 def get_parent_detail_context(watcher: User, parent_id: int) -> dict | None:
@@ -127,6 +154,73 @@ def get_parent_detail_context(watcher: User, parent_id: int) -> dict | None:
         },
         "recent_records": recent_records,
     }
+
+
+def get_unread_count(watcher: User) -> int:
+    """未読通知数だけを軽量に返す（parent_detail等で使用）"""
+    from sqlalchemy import func
+    rels = (
+        WatchRelationship.query
+        .filter_by(watcher_user_id=watcher.id, status="active")
+        .join(WatchRelationship.parent)
+        .filter(User.deleted_at.is_(None))
+        .all()
+    )
+    parent_ids = [r.parent_user_id for r in rels]
+    latest_map: dict[int, DailyRecord] = {}
+    if parent_ids:
+        subq = (
+            db.session.query(
+                DailyRecord.parent_user_id,
+                func.max(DailyRecord.record_date).label("max_date"),
+            )
+            .filter(DailyRecord.parent_user_id.in_(parent_ids))
+            .filter(DailyRecord.deleted_at.is_(None))
+            .group_by(DailyRecord.parent_user_id)
+            .subquery()
+        )
+        latest_records = (
+            db.session.query(DailyRecord)
+            .join(subq, (DailyRecord.parent_user_id == subq.c.parent_user_id)
+                  & (DailyRecord.record_date == subq.c.max_date))
+            .all()
+        )
+        latest_map = {r.parent_user_id: r for r in latest_records}
+
+    today = today_jst()
+    viewed_at = watcher.notifications_viewed_at
+    unread_count = 0
+
+    for rel in rels:
+        latest = latest_map.get(rel.parent_user_id)
+        if latest:
+            days_since = (today - latest.record_date).days
+            alert_level = latest.alert_level if days_since < 14 else 0
+        else:
+            days_since = None
+            alert_level = 0
+
+        has_alert = (
+            alert_level >= 2
+            or days_since is None
+            or days_since >= 2
+        )
+        if not has_alert:
+            continue
+        if viewed_at is None:
+            unread_count += 1
+        else:
+            if latest is None:
+                pass
+            else:
+                rec_time = latest.updated_at
+                if rec_time and rec_time.tzinfo:
+                    rec_time = rec_time.replace(tzinfo=None)
+                vt = viewed_at.replace(tzinfo=None) if viewed_at.tzinfo else viewed_at
+                if rec_time > vt:
+                    unread_count += 1
+
+    return unread_count
 
 
 def _user_dict(user: User) -> dict:
