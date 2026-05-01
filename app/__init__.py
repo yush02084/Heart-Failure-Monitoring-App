@@ -1,9 +1,28 @@
+import os
 from flask import Flask
-from app.extensions import db, login_manager, bcrypt, migrate, csrf, scheduler
+from app.extensions import db, login_manager, bcrypt, migrate, csrf, scheduler, mail
 from config import Config
 
 
+def _init_sentry():
+    """SENTRY_DSN が設定されていれば例外監視を有効化。医療データ保護のため send_default_pii=False。"""
+    dsn = os.getenv("SENTRY_DSN")
+    if not dsn:
+        return
+    import sentry_sdk
+    from sentry_sdk.integrations.flask import FlaskIntegration
+
+    sentry_sdk.init(
+        dsn=dsn,
+        integrations=[FlaskIntegration()],
+        traces_sample_rate=0.1,
+        send_default_pii=False,
+    )
+
+
 def create_app(config_class=Config):
+    _init_sentry()
+
     app = Flask(__name__)
     app.config.from_object(config_class)
 
@@ -13,6 +32,7 @@ def create_app(config_class=Config):
     bcrypt.init_app(app)
     migrate.init_app(app, db)
     csrf.init_app(app)
+    mail.init_app(app)
 
     # APScheduler: 毎朝7時JSTに未記録チェック通知
     if not scheduler.running:
@@ -64,6 +84,15 @@ def create_app(config_class=Config):
         response.headers["Cache-Control"] = "no-cache"
         return response
 
+    @app.route("/healthz")
+    def healthz():
+        from sqlalchemy import text
+        try:
+            db.session.execute(text("SELECT 1"))
+            return {"status": "ok"}, 200
+        except Exception:
+            return {"status": "db_error"}, 503
+
     @app.route("/")
     def index():
         if current_user.is_authenticated:
@@ -95,10 +124,11 @@ def create_app(config_class=Config):
 
 
 def _seed_if_empty():
-    """テーブルがなければ作成し、DBが空のときだけデモデータを投入する"""
+    """DBが空のときだけデモデータを投入する。
+    スキーマ作成は Alembic (flask db upgrade) で行うため、ここでは create_all() を呼ばない。
+    Users テーブル未作成の場合は OperationalError が出るが、無視して何もしない。
+    """
     from sqlalchemy.exc import OperationalError
-    # テーブルが存在しない場合は自動作成（flask db upgrade の代わり）
-    db.create_all()
     try:
         from app.models.user import User
         if User.query.first():
